@@ -331,16 +331,6 @@
             color: var(--primary-color);
         }
         {% endif %}
-        {% if rd.articles.style.link_icon %}
-        .markdown-body a.external-link::after {
-            content: "\f35d";
-            font-family: "Font Awesome 6 Pro";
-            font-weight: 900;
-            font-size: 0.75em;
-            margin-left: 0.25em;
-            opacity: 0.6;
-        }
-        {% endif %}
 
         /* --- articles.toc.expand --- */
         .post-toc .nav .nav-child { display: {% if rd.articles.toc.expand %}block{% else %}none{% endif %}; }

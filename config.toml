@@ -16,7 +16,6 @@ taxonomies = [
 ]
 
 [markdown]
-external_links_class = "external-link"
 # 语法高亮：等价于原主题 articles.code_block.highlight_theme.light/dark
 # 可选主题见 https://github.com/getzola/giallo（github-light / dark-plus / one-dark-pro ...）
 [markdown.highlighting]

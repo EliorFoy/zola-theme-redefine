@@ -1,5 +1,28 @@
 {% set rd = config.extra.redefine %}
 
+<script>
+  {# 外链处理（1:1 复刻原版 scripts/filters/link-handle.js，构建期改为运行时） #}
+  window.__redefineLinkHandle = function () {
+    if (!window.theme || !theme.articles || !theme.articles.style) return;
+    const linkIcon = theme.articles.style.link_icon !== false;
+    const siteHost = window.config && window.config.hostname;
+    document.querySelectorAll(".markdown-body a[href]").forEach((a) => {
+      if (a.dataset.linkHandled) return;
+      if (a.children.length > 0) return; {# 原版只处理纯文本链接 #}
+      let url;
+      try { url = new URL(a.getAttribute("href")); } catch (e) { return; }
+      if (!url.protocol || url.hostname === siteHost) return;
+      a.classList.add("link");
+      a.dataset.linkHandled = "true";
+      if (linkIcon && !a.querySelector(".link-icon")) {
+        a.insertAdjacentHTML("beforeend", '<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i>');
+      }
+    });
+  };
+  window.__redefineLinkHandle();
+  window.addEventListener("redefine:page:refresh", () => window.__redefineLinkHandle());
+</script>
+
 {% if rd.plugins.mermaid.enable %}
 <script>
   {# 将 Zola 的 ```mermaid 代码块转换为 .mermaid 容器（等价 hexo-filter-mermaid-diagrams） #}
