@@ -10,7 +10,7 @@
                 {% include "partials/statistics.html" %}
             </div>
             {% if has_sidebar_links or has_announcement %}
-                <div class="sidebar-links">
+                <div class="sidebar-links"{% if has_sidebar_links or has_announcement %} marginTop{% endif %}>
                     <div class="site-info">
                         <div class="site-name">{{ rd.info.title | default(value=config.title) }}</div>
                         {% if has_announcement and has_sidebar_links %}
@@ -66,7 +66,7 @@
                     {% endif %}
                 </div>
             {% endif %}
-            <div class="sidebar-content">
+            <div class="sidebar-content"{% if has_sidebar_links or has_announcement %} marginTop{% endif %}>
                 {% include "partials/sidebar-avatar.html" %}
                 {% include "partials/sidebar-author.html" %}
                 {% include "partials/statistics.html" %}
