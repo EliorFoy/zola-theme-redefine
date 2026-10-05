@@ -8,9 +8,9 @@ categories = ["技术"]
 +++
 Zola 是一个使用 Rust 编写的静态站点生成器，单二进制文件、构建速度快。
 
-## 安装
-
 <!-- more -->
+
+## 安装
 
 ```bash
 # Windows (winget)
