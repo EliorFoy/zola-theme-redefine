@@ -48,6 +48,35 @@
 </script>
 {% endif %}
 
+{% set linenos_on = true %}
+{% if rd.articles.code_block is defined and rd.articles.code_block.line_number is defined %}
+  {% set linenos_on = rd.articles.code_block.line_number %}
+{% endif %}
+{% if linenos_on %}
+<script>
+  {# 代码块行号（等价 hexo highlight.line_number: true） #}
+  window.__redefineLinenos = function () {
+    document.querySelectorAll("pre.giallo code").forEach((code) => {
+      if (code.dataset.linenosReady) return;
+      code.dataset.linenosReady = "true";
+      const lines = code.querySelectorAll(".giallo-l");
+      if (lines.length === 0) return;
+      let n = 0;
+      lines.forEach((line) => {
+        if (line.querySelector(".giallo-ln")) return;
+        n += 1;
+        const ln = document.createElement("span");
+        ln.className = "giallo-ln";
+        ln.textContent = n;
+        line.prepend(ln);
+      });
+    });
+  };
+  window.__redefineLinenos();
+  window.addEventListener("redefine:page:refresh", () => window.__redefineLinenos());
+</script>
+{% endif %}
+
 <script type="module" src="{{ get_url(path='js/build/main.js') }}"></script>
 
 {% if rd.footer.runtime %}

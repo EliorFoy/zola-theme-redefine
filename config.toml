@@ -336,6 +336,7 @@ list = ["Lv1", "Lv2", "Lv3"]
 [extra.redefine.articles.code_block]
 copy = true
 style = "mac"
+line_number = true
 
 [extra.redefine.articles.code_block.font]
 enable = false
