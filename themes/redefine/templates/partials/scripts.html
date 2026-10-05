@@ -1,4 +1,30 @@
 {% set rd = config.extra.redefine %}
+
+{% if rd.plugins.mermaid.enable %}
+<script>
+  {# 将 Zola 的 ```mermaid 代码块转换为 .mermaid 容器（等价 hexo-filter-mermaid-diagrams） #}
+  window.__redefineMermaidShim = function () {
+    document.querySelectorAll("pre > code[data-lang='mermaid']").forEach((code) => {
+      const pre = code.parentElement;
+      const div = document.createElement("div");
+      div.className = "mermaid";
+      div.textContent = code.textContent;
+      pre.replaceWith(div);
+    });
+  };
+  window.__redefineMermaidShim();
+  window.addEventListener("redefine:page:refresh", () => window.__redefineMermaidShim());
+</script>
+{% endif %}
+
+{% set math_on = false %}
+{% if rd.math is defined and rd.math.enable %}{% set math_on = rd.math.enable %}{% endif %}
+{% if math_on %}
+<script>
+  window.addEventListener("redefine:page:refresh", () => window.__redefineRenderMath && window.__redefineRenderMath());
+</script>
+{% endif %}
+
 <script type="module" src="{{ get_url(path='js/build/main.js') }}"></script>
 
 {% if rd.footer.runtime %}

@@ -122,6 +122,31 @@ Zola 0.23 移除了 shortcodes，改用 **Tera 组件**。主题在 `templates/c
   HTML 块，否则缩进行会被解析为代码块（tabs 组件已按此约定实现）。
 - 旧 note 系列标签已废弃，请统一使用 `callout` 组件。
 
+## 从 Hexo 博客迁移文章
+
+主题自带转换脚本（输出到你的站点 content/，不会改动主题）：
+
+```bash
+node themes/redefine/tools/hexo-to-zola.mjs <hexo-source目录或单个.md> <zola-content目标目录>
+# 例：node themes/redefine/tools/hexo-to-zola.mjs ~/blog/source/_posts ./content
+```
+
+- `tags` / `categories`（数组或字符串）→ `[taxonomies]`
+- `excerpt / cover / banner / thumbnail / sticky / expires / mathjax / publish` 等 → `[extra]`
+- 无 `date` 的页面回退为文件修改时间；脚本可重复运行（幂等）
+- Hexo 标签插件（`{% note %}` 等）需按上文组件表手工改写；```mermaid 围栏无需改动
+
+配套约定：
+
+- **独立页面**（friends/bookmarks/essays/gallery）：Hexo 的 `source/xxx/index.md`
+  对应 Zola 的 `content/xxx/_index.md`（section，`template = "friends.html"`），
+  不会出现在首页文章列表；页面数据（如 `source/_data/links.yml`）转成
+  `config.toml` 的 `[[extra.redefine.links]]`。
+- **导航/侧栏链接名**：`name` 是翻译键，需在站点 `[translations]` 中存在
+  （如 `Github = "GitHub"`），否则构建报错。
+- Hexo 的 `permalink: :year/:month/:day/:title/` 日期式链接 Zola 无法原生生成，
+  迁移后文章路径为 `/文章slug/`（可用 `aliases` 保留旧链接跳转）。
+
 ## 官方文档功能核对清单
 
 对照 redefine-docs（zh/docs）逐项核对的结果：
@@ -141,12 +166,12 @@ Zola 0.23 移除了 shortcodes，改用 **Tera 组件**。主题在 `templates/c
 | inject | head/footer 注入 | ✅ |
 | page_templates | friends、tags（blur/cloud）、categories、masonry、bookmarks | ✅ |
 | modules | callout、button、folding、grid、tabs | ✅ 以 Tera 组件实现（见上表） |
-| plugins/mermaid | mermaid 图表 + 明暗主题 | ✅ `{% <mermaid> %}` 组件 |
+| plugins/mermaid | mermaid 图表 + 明暗主题 | ✅ `{% <mermaid> %}` 组件；**```mermaid 代码块运行时自动转换**（等价 hexo-filter-mermaid-diagrams，旧文章无需改动） |
 | plugins/aplayer | 固定播放器 | ✅ 配置 `plugins.aplayer.audios` 数组后自动加载 |
+| plugins/mathjax · markdown-it-katex | LaTeX 公式 | ✅ 主题级 `[extra.redefine.math]`（engine = "katex"/"mathjax"，KaTeX auto-render 支持 `$…$`/`$$…$$`/`\(…\)`；单篇 `extra.math = false` 可关闭） |
 | shuoshuo/essays | 本地说说 | ✅ `[[extra.redefine.essays]]` |
 | shuoshuo/artitalk | Artitalk 远程说说 | ➖ 与主题无关，用 `inject` 注入 Artitalk JS 即可 |
-| plugins/encrypt | 文章加密 | ➖ Hexo 构建期插件无 Zola 等价物；可改用静态站通用的客户端加密方案 |
-| plugins/mathjax | LaTeX 公式 | ➖ 通过 `inject` 引入 MathJax/KaTeX（Zola 无内置渲染） |
+| plugins/encrypt | 文章加密 | ➖ Hexo 构建期插件无 Zola 等价物；hbe 前端脚本已随主题带入 |
 | plugins/all_minifier | 全站压缩 | ➖ Zola 用 `minify_html = true`；CSS/JS 主题侧已压缩 |
 | cdn | 主题资产 CDN | ➖ Zola 主题本地分发，无 npm CDN 概念；可用对象存储镜像 static/ |
 | language | en/zh-CN/zh-TW/ja | ✅ `default_language` + `[translations]` + i18n JS（附赠 es/fr） |

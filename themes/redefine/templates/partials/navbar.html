@@ -24,7 +24,7 @@
                             {% set link_href = "#" %}
                             {% if not has_submenus %}{% set link_href = get_url(path=link.path) %}{% endif %}
                             {% set is_active = false %}
-                            {% if current_path is defined %}
+                            {% if current_path is defined and link.path is defined %}
                                 {% set is_active = current_path == link.path %}
                                 {% if not is_active and link.path != "/" and link.path != "#" %}
                                     {% set is_active = current_path | split(pat=link.path) | length > 1 %}
@@ -76,7 +76,7 @@
                 {% if link.path != "none" %}
                     {% set has_submenus = link.submenus is defined and link.submenus | length > 0 %}
                     {% set is_active = false %}
-                    {% if current_path is defined %}
+                    {% if current_path is defined and link.path is defined %}
                         {% set is_active = current_path == link.path %}
                         {% if not is_active and link.path != "/" and link.path != "#" %}
                             {% set is_active = current_path | split(pat=link.path) | length > 1 %}

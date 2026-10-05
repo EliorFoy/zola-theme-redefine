@@ -61,6 +61,7 @@ const initCopyCode = () => {
 
     const figure = document.createElement("figure");
     figure.classList.add("highlight");
+    figure.dataset.codeBlockReady = "true";
     wrapElement(pre, figure);
 
     attachTools(container, () => {
@@ -72,7 +73,7 @@ const initCopyCode = () => {
 
   // 兼容 hexo 生成的 figure.highlight 结构
   document.querySelectorAll("figure.highlight").forEach((element) => {
-    if (element.dataset.codeBlockReady || element.parentElement?.classList.contains("highlight-container")) {
+    if (element.dataset.codeBlockReady || element.querySelector("pre.giallo") || element.parentElement?.classList.contains("highlight-container")) {
       return;
     }
 

@@ -1,38 +1,37 @@
 {% set rd = config.extra.redefine %}
-{# 推荐阅读：同分类优先，其余按时间补充（原版为 nodejieba 余弦相似度，静态站内以分类聚合近似；数量由 CSS 精确截断） #}
+{# 推荐阅读：同分类优先，其余按时间补足到 limit（原版为 nodejieba 余弦相似度，静态站内近似；
+   先输出同分类文章，再输出其余文章，超出 limit 的由 CSS 隐藏，保证总显示数恒等于 limit） #}
 {% set root_section = get_section(path="_index.md") %}
 {% set rec_limit = rd.articles.recommendation.limit | default(value=3) %}
 {% set rec_mobile_limit = rd.articles.recommendation.mobile_limit | default(value=2) %}
 {% set page_cats = page.taxonomies.categories | default(value=[]) %}
 {% set primary_cat = "" %}
 {% if page_cats | length > 0 %}{% set primary_cat = page_cats | first %}{% endif %}
-{% set rec_source = root_section.pages %}
-{% if primary_cat %}
-    {% set tt = get_taxonomy_term(kind="categories", term=primary_cat) %}
-    {% if tt.pages | length > 1 %}{% set rec_source = tt.pages %}{% endif %}
-{% endif %}
-{% set rec = rec_source %}
 <div class="recommended-article px-2 sm:px-6 md:px-8">
    <style>
-     .recommended-desktop .recommended-article-group a:nth-child(n + {{ rec_limit + 1 }}) { display: none; }
-     .recommended-mobile .recommended-article-group a:nth-child(n + {{ rec_mobile_limit + 1 }}) { display: none; }
+     .recommended-desktop .recommended-article-group a.recommended-article-item:nth-child(n + {{ rec_limit + 1 }}) { display: none !important; }
+     .recommended-mobile .recommended-article-group a.recommended-article-item:nth-child(n + {{ rec_mobile_limit + 1 }}) { display: none !important; }
    </style>
    <div class="recommended-desktop">
     <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>{{ rd.articles.recommendation.title }}</span>
     </div>
     <div class="recommended-article-group">
-      {% for item in rec %}
-        {% if item.permalink != page.permalink and loop.index0 <= rec_limit %}
-          {% set headimg = rd.articles.recommendation.placeholder %}
-          {% if item.extra.thumbnail is defined %}{% set headimg = item.extra.thumbnail %}
-          {% elif item.extra.cover is defined %}{% set headimg = item.extra.cover %}
-          {% elif item.extra.banner is defined %}{% set headimg = item.extra.banner %}{% endif %}
-          <a class="recommended-article-item" href="{{ item.permalink }}" title="{{ item.title }}" rel="bookmark">
-            <img src="{{ get_url(path=headimg) }}" alt="{{ item.title }}" class="!max-w-none">
-            <span class="title">{{ item.title }}</span>
-          </a>
+      {# 同分类 #}
+      {% if primary_cat %}
+        {% set tt = get_taxonomy_term(kind="categories", term=primary_cat) %}
+        {% for item in tt.pages %}
+          {% if item.permalink != page.permalink and loop.index0 < rec_limit %}{% include "partials/recommendation-item.html" %}{% endif %}
+        {% endfor %}
+      {% endif %}
+      {# 其余按时间补足 #}
+      {% for item in root_section.pages %}
+        {% set item_cats_json = item.taxonomies.categories | default(value=[]) | json_encode %}
+        {% set in_same = false %}
+        {% if primary_cat %}
+          {% if item_cats_json | split(pat='"' ~ primary_cat ~ '"') | length > 1 %}{% set in_same = true %}{% endif %}
         {% endif %}
+        {% if item.permalink != page.permalink and not in_same %}{% include "partials/recommendation-item.html" %}{% endif %}
       {% endfor %}
     </div>
    </div>
@@ -41,18 +40,22 @@
      <i aria-hidden="true"></i><span>{{ rd.articles.recommendation.title }}</span>
    </div>
    <div class="recommended-article-group">
-     {% for item in rec %}
-       {% if item.permalink != page.permalink and loop.index0 <= rec_mobile_limit %}
-         {% set headimg = rd.articles.recommendation.placeholder %}
-         {% if item.extra.thumbnail is defined %}{% set headimg = item.extra.thumbnail %}
-         {% elif item.extra.cover is defined %}{% set headimg = item.extra.cover %}
-         {% elif item.extra.banner is defined %}{% set headimg = item.extra.banner %}{% endif %}
-         <a class="recommended-article-item" href="{{ item.permalink }}" title="{{ item.title }}" rel="bookmark">
-           <img src="{{ get_url(path=headimg) }}" alt="{{ item.title }}" class="!max-w-none">
-           <span class="title">{{ item.title }}</span>
-         </a>
-       {% endif %}
-     {% endfor %}
+      {# 同分类 #}
+      {% if primary_cat %}
+        {% set tt = get_taxonomy_term(kind="categories", term=primary_cat) %}
+        {% for item in tt.pages %}
+          {% if item.permalink != page.permalink and loop.index0 < rec_mobile_limit %}{% include "partials/recommendation-item.html" %}{% endif %}
+        {% endfor %}
+      {% endif %}
+      {# 其余按时间补足 #}
+      {% for item in root_section.pages %}
+        {% set item_cats_json = item.taxonomies.categories | default(value=[]) | json_encode %}
+        {% set in_same = false %}
+        {% if primary_cat %}
+          {% if item_cats_json | split(pat='"' ~ primary_cat ~ '"') | length > 1 %}{% set in_same = true %}{% endif %}
+        {% endif %}
+        {% if item.permalink != page.permalink and not in_same %}{% include "partials/recommendation-item.html" %}{% endif %}
+      {% endfor %}
    </div>
    </div>
 </div>

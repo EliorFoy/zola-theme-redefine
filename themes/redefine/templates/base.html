@@ -125,6 +125,7 @@
 
     <link rel="stylesheet" href="{{ get_url(path='css/style.css') }}">
     <link rel="stylesheet" href="{{ get_url(path='css/tailwind.css') }}">
+    <link rel="stylesheet" href="{{ get_url(path='css/codeblock-zola.css') }}">
 
     <link rel="stylesheet" href="{{ get_url(path='fonts/GeistMono/geist-mono.css') }}">
     <link rel="stylesheet" href="{{ get_url(path='fonts/Geist/geist.css') }}">
@@ -178,6 +179,51 @@
     {% endif %}
     {% if rd.global.preloader.enable %}
     <script src="{{ get_url(path='js/build/libs/anime.min.js') }}"></script>
+    {% endif %}
+
+    <!--- 数学公式（对应 hexo 的 markdown-it-katex / hexo-filter-mathjax 插件） -->
+    {% set math_on = false %}
+    {% if rd.math is defined and rd.math.enable %}{% set math_on = rd.math.enable %}{% endif %}
+    {% if page is defined and page.extra.math is defined %}{% set math_on = page.extra.math %}{% endif %}
+    {% if math_on %}
+      {% set math_engine = "katex" %}
+      {% if rd.math is defined and rd.math.engine is defined %}{% set math_engine = rd.math.engine %}{% endif %}
+      {% if math_engine == "mathjax" %}
+      <script>
+        window.MathJax = {
+          tex: { inlineMath: [["$", "$"], ["\\(", "\\)"]], displayMath: [["$$", "$$"], ["\\[", "\\]"]] },
+          options: { skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code", "option"] }
+        };
+      </script>
+      <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      {% else %}
+      {% set katex_css = 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css' %}
+      {% set katex_js = 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js' %}
+      {% set katex_ar_js = 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js' %}
+      {% if rd.math.katex is defined %}
+        {% if rd.math.katex.css is defined %}{% set katex_css = rd.math.katex.css %}{% endif %}
+        {% if rd.math.katex.js is defined %}{% set katex_js = rd.math.katex.js %}{% endif %}
+        {% if rd.math.katex.auto_render_js is defined %}{% set katex_ar_js = rd.math.katex.auto_render_js %}{% endif %}
+      {% endif %}
+      <link rel="stylesheet" href="{{ katex_css }}">
+      <script defer src="{{ katex_js }}"></script>
+      <script defer src="{{ katex_ar_js }}"
+        onload="window.__redefineRenderMath && window.__redefineRenderMath()"></script>
+      <script>
+        window.__redefineRenderMath = function () {
+          if (!window.renderMathInElement) return;
+          window.renderMathInElement(document.body, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false },
+              { left: "\\(", right: "\\)", display: false },
+              { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code", "option"]
+          });
+        };
+      </script>
+      {% endif %}
     {% endif %}
 
     <!--- JS 运行时配置（对应原主题 export_config()） -->
@@ -247,11 +293,15 @@
 
         /* --- global.fonts --- */
         {% if rd.global.fonts.chinese.enable or rd.global.fonts.english.enable %}
+        {% set cn_family = rd.global.fonts.chinese.family %}
+        {% if not cn_family %}{% set cn_family = "PingFang SC" %}{% endif %}
+        {% set en_family = rd.global.fonts.english.family %}
+        {% if not en_family %}{% set en_family = "Geist Variable" %}{% endif %}
         .markdown-body,
         .home-article-content,
         .post-toc-wrap,
         .article-copyright-info-container {
-            font-family: {% if rd.global.fonts.english.enable %}'{{ rd.global.fonts.english.family }}', {% endif %}{% if rd.global.fonts.chinese.enable %}'{{ rd.global.fonts.chinese.family }}', {% endif %}sans-serif;
+            font-family: {% if rd.global.fonts.english.enable %}'{{ en_family }}', {% endif %}{% if rd.global.fonts.chinese.enable %}'{{ cn_family }}', {% endif %}sans-serif;
         }
         {% endif %}
 
@@ -284,7 +334,7 @@
         {% if rd.articles.style.link_icon %}
         .markdown-body a.external-link::after {
             content: "\f35d";
-            font-family: "Font Awesome 6 Free";
+            font-family: "Font Awesome 6 Pro";
             font-weight: 900;
             font-size: 0.75em;
             margin-left: 0.25em;

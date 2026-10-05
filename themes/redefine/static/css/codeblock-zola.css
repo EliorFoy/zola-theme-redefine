@@ -1,0 +1,9 @@
+/* Zola (giallo) 代码块适配补充：hexo 版通过 table>td.code 提供左右内边距，
+   Zola 直接输出 pre，这里补齐等价内边距与外边距 */
+.code-container pre.giallo {
+  padding: 14px 10px 10px !important;
+}
+figure.highlight > pre.giallo {
+  margin-top: 0;
+  margin-bottom: 0;
+}

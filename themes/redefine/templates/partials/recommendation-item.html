@@ -1,0 +1,10 @@
+{% set rd = config.extra.redefine %}
+{# 单条推荐卡片：从上下文读取 item（item 为一个 page 对象） #}
+{% set headimg = rd.articles.recommendation.placeholder %}
+{% if item.extra.thumbnail is defined %}{% set headimg = item.extra.thumbnail %}
+{% elif item.extra.cover is defined %}{% set headimg = item.extra.cover %}
+{% elif item.extra.banner is defined %}{% set headimg = item.extra.banner %}{% endif %}
+<a class="recommended-article-item" href="{{ item.permalink }}" title="{{ item.title }}" rel="bookmark">
+  <img src="{{ get_url(path=headimg) }}" alt="{{ item.title }}" class="!max-w-none">
+  <span class="title">{{ item.title }}</span>
+</a>
