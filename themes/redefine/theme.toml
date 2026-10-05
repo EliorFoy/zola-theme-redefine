@@ -1,7 +1,9 @@
 name = "redefine"
 description = "Fast, Pure, Elegant — Zola port of the Hexo theme Redefine"
 license = "GPL-3.0"
-homepage = "https://github.com/evannotfound/hexo-theme-redefine"
+homepage = "https://github.com/EliorFoy/zola-theme-redefine"
+# Upstream Hexo theme (GPL-3.0) by EvanNotFound:
+# https://github.com/EvanNotFound/hexo-theme-redefine
 min_version = "0.23.0"
 demo = ""
 
