@@ -1,0 +1,39 @@
+{% set rd = config.extra.redefine %}
+<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>{{ trans(key='copyright_title') }}:</strong> {{ page.title }}</li>
+        <li><strong>{{ trans(key='copyright_author') }}:</strong> {% if page.extra.author %}{{ page.extra.author }}{% else %}{{ rd.info.author | default(value=config.author) }}{% endif %}</li>
+        <li><strong>{{ trans(key='copyright_create_time') }}:</strong> {{ page.date | date(format="%Y-%m-%d %H:%M") }}</li>
+        {% if page.updated and page.updated != page.date %}
+            <li><strong>{{ trans(key='copyright_update_time') }}:</strong> {{ page.updated | date(format="%Y-%m-%d %H:%M") }}</li>
+        {% endif %}
+        <li><strong>{{ trans(key='copyright_link') }}:</strong> {{ page.permalink }}</li>
+        <li>
+            <strong>{{ trans(key='copyright_license_title') }}:</strong>
+            {% set license_type = rd.articles.copyright.default %}
+            {% if page.extra.copyright %}{% set license_type = "custom" %}
+            {% elif page.extra.license and rd.articles.copyright.default %}{% set license_type = page.extra.license %}{% endif %}
+
+            {% if license_type == "custom" %}
+                {{ page.extra.copyright | safe }}
+            {% elif license_type == "all_rights_reserved" %}
+                {{ trans(key='copyright_all_rights_reserved') }}
+            {% elif license_type == "public_domain" %}
+                {{ trans(key='copyright_public_domain') }}
+            {% else %}
+                {% if license_type == "cc_by" %}
+                    {% set license_name = "CC BY 4.0" %}{% set license_url = "https://creativecommons.org/licenses/by/4.0" %}
+                {% elif license_type == "cc_by_sa" %}
+                    {% set license_name = "CC BY-SA 4.0" %}{% set license_url = "https://creativecommons.org/licenses/by-sa/4.0" %}
+                {% elif license_type == "cc_by_nc" %}
+                    {% set license_name = "CC BY-NC 4.0" %}{% set license_url = "https://creativecommons.org/licenses/by-nc/4.0" %}
+                {% elif license_type == "cc_by_nd" %}
+                    {% set license_name = "CC BY-ND 4.0" %}{% set license_url = "https://creativecommons.org/licenses/by-nd/4.0" %}
+                {% else %}
+                    {% set license_name = "CC BY-NC-SA 4.0" %}{% set license_url = "https://creativecommons.org/licenses/by-nc-sa/4.0" %}
+                {% endif %}
+                {{ trans(key='copyright_license_content') | replace(from="%s", to='<a class="license" href="' ~ license_url ~ '">' ~ license_name ~ '</a>') | safe }}
+            {% endif %}
+        </li>
+    </ul>
+</div>

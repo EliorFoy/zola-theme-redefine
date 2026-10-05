@@ -1,0 +1,22 @@
+{% set rd = config.extra.redefine %}
+<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        {{ trans(key='comments') }}
+    </div>
+    {% if rd.comment.enable and rd.comment.system %}
+        {% if rd.comment.system == "waline" %}
+            {% include "partials/comments/waline.html" %}
+        {% elif rd.comment.system == "gitalk" %}
+            {% include "partials/comments/gitalk.html" %}
+        {% elif rd.comment.system == "twikoo" %}
+            {% include "partials/comments/twikoo.html" %}
+        {% elif rd.comment.system == "giscus" %}
+            {% include "partials/comments/giscus.html" %}
+        {% elif rd.comment.system == "artalk" %}
+            {% include "partials/comments/artalk.html" %}
+        {% elif rd.comment.system == "utterances" %}
+            {% include "partials/comments/utterances.html" %}
+        {% endif %}
+    {% endif %}
+</div>

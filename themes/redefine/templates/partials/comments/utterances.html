@@ -1,0 +1,48 @@
+{% set rd = config.extra.redefine %}
+{% set uc = rd.comment.config.utterances %}
+{% if rd.comment.system == "utterances" and uc.repo %}
+    {% set issue_term = uc.issue_term | default(value="pathname") %}
+    {% set theme_light = uc.theme_light | default(value="github-light") %}
+    {% set theme_dark = uc.theme_dark | default(value="github-dark") %}
+    <div id="utterances-container"
+         data-utterances-theme-light="{{ theme_light }}"
+         data-utterances-theme-dark="{{ theme_dark }}">
+    </div>
+    <script {% if rd.global.single_page %}data-swup-reload-script{% endif %}>
+        (function() {
+            const container = document.getElementById("utterances-container");
+            if (!container) return;
+
+            const repo = "{{ uc.repo }}";
+            const issueNumber = "{{ uc.issue_number | default(value='') }}";
+            const issueTerm = "{{ issue_term }}";
+            const label = "{{ uc.label | default(value='') }}";
+
+            if (!repo || (!issueNumber && !issueTerm)) return;
+
+            container.innerHTML = "";
+
+            const themeLight = container.dataset.utterancesThemeLight || "github-light";
+            const themeDark = container.dataset.utterancesThemeDark || "github-dark";
+            const isDark = document.body.classList.contains("dark-mode");
+            const theme = isDark ? themeDark : themeLight;
+
+            const script = document.createElement("script");
+            script.src = "https://utteranc.es/client.js";
+            script.async = true;
+            script.crossOrigin = "anonymous";
+            script.setAttribute("repo", repo);
+
+            if (issueNumber) {
+                script.setAttribute("issue-number", issueNumber);
+            } else {
+                script.setAttribute("issue-term", issueTerm);
+            }
+
+            if (label) script.setAttribute("label", label);
+
+            script.setAttribute("theme", theme);
+            container.appendChild(script);
+        })();
+    </script>
+{% endif %}

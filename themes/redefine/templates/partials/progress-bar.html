@@ -1,0 +1,10 @@
+{% set rd = config.extra.redefine %}
+<div class="progress-bar-container">
+	{% if rd.global.scroll_progress.bar %}
+	<span class="scroll-progress-bar"></span>
+	{% endif %}
+
+	{% if rd.global.single_page %}
+	<span class="pjax-progress-bar"></span>
+	{% endif %}
+</div>

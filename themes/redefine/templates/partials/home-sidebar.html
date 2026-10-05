@@ -1,0 +1,77 @@
+{% set rd = config.extra.redefine %}
+{% set has_sidebar_links = rd.home.sidebar.links and rd.home.sidebar.links | length > 0 %}
+{% set has_announcement = rd.home.sidebar.announcement %}
+<div class="home-sidebar-container">
+    <div class="sticky-container sticky">
+        {% if rd.home.sidebar.first_item == "info" %}
+            <div class="sidebar-content">
+                {% include "partials/sidebar-avatar.html" %}
+                {% include "partials/sidebar-author.html" %}
+                {% include "partials/statistics.html" %}
+            </div>
+            {% if has_sidebar_links or has_announcement %}
+                <div class="sidebar-links">
+                    <div class="site-info">
+                        <div class="site-name">{{ rd.info.title | default(value=config.title) }}</div>
+                        {% if has_announcement and has_sidebar_links %}
+                            <div class="announcement">
+                                {{ rd.home.sidebar.announcement | safe }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if has_sidebar_links %}
+                        {% for link in rd.home.sidebar.links %}
+                            {% if link.path != "none" %}
+                                <a class="links" href="{{ link.path }}">
+                                    {% if link.icon %}
+                                        <i class="{{ link.icon }} icon-space"></i>
+                                    {% endif %}
+                                    <span class="link-name">{{ trans(key=link.name) | default(value=link.name) }}</span>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="announcement-outside">
+                            {{ rd.home.sidebar.announcement | safe }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            {% if has_sidebar_links or has_announcement %}
+                <div class="sidebar-links">
+                    <div class="site-info">
+                        <div class="site-name">{{ rd.info.title | default(value=config.title) }}</div>
+                        {% if has_announcement and has_sidebar_links %}
+                            <div class="announcement">
+                                {{ rd.home.sidebar.announcement | safe }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if has_sidebar_links %}
+                        {% for link in rd.home.sidebar.links %}
+                            {% if link.path != "none" %}
+                                <a class="links" href="{{ link.path }}">
+                                    {% if link.icon %}
+                                        <i class="{{ link.icon }} icon-space"></i>
+                                    {% endif %}
+                                    <span class="link-name">{{ trans(key=link.name) | default(value=link.name) }}</span>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="announcement-outside">
+                            {{ rd.home.sidebar.announcement | safe }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="sidebar-content">
+                {% include "partials/sidebar-avatar.html" %}
+                {% include "partials/sidebar-author.html" %}
+                {% include "partials/statistics.html" %}
+            </div>
+        {% endif %}
+
+    </div>
+</div>

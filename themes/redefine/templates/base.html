@@ -1,0 +1,292 @@
+{% set rd = config.extra.redefine %}
+{% set home_first = false %}
+{% if paginator is defined %}{% set home_first = rd.home_banner.enable and paginator.current_index == 1 %}{% endif %}
+<!DOCTYPE html>
+<html lang="{% if lang is defined %}{{ lang }}{% else %}{{ config.default_language }}{% endif %}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="{% if page is defined and page.extra.keywords is defined %}{{ page.extra.keywords }}{% else %}{{ config.title }}{% endif %}">
+
+    {% set og_enabled = rd.global.open_graph.enable %}
+    {% if not og_enabled %}
+    <meta name="description" content="{% if page is defined and page.description %}{{ page.description }}{% elif page is defined and page.extra.description %}{{ page.extra.description }}{% else %}{{ config.description | default(value=rd.info.subtitle) }}{% endif %}">
+    {% endif %}
+    <meta name="author" content="{{ rd.info.author | default(value=config.author) }}">
+    <meta name="robots" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+
+            const theme = getTheme();
+            applyTheme(theme);
+
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+
+            (function() {
+                const addBodyClass = () => {
+                    const b = document.body;
+                    if (!b) return false;
+                    b.classList.add(theme + "-mode");
+                    return true;
+                };
+
+                if (addBodyClass()) return;
+
+                const mo = new MutationObserver(() => {
+                    if (addBodyClass()) mo.disconnect();
+                });
+                mo.observe(document.documentElement, { childList: true, subtree: true });
+            })();
+        })();
+    </script>
+
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!--- Seo Part-->
+    {% if current_url is defined %}<link rel="canonical" href="{{ current_url | lower }}">{% endif %}
+
+    {% if og_enabled %}
+    {% set og_image = rd.global.open_graph.image %}
+    {% if page is defined and page.extra.og_image is defined %}{% set og_image = page.extra.og_image %}{% endif %}
+    {% set og_desc = rd.global.open_graph.description | default(value=config.description) %}
+    {% if page is defined and page.extra.og_description is defined %}{% set og_desc = page.extra.og_description %}{% elif page is defined and page.description %}{% set og_desc = page.description %}{% endif %}
+    <meta property="og:title" content="{% if page is defined and page.title %}{{ page.title }}{% else %}{{ config.title }}{% endif %}">
+    <meta property="og:description" content="{{ og_desc }}">
+    <meta property="og:type" content="{% if page is defined and page.date %}article{% else %}website{% endif %}">
+    <meta property="og:url" content="{% if current_url is defined %}{{ current_url }}{% else %}{{ config.base_url }}{% endif %}">
+    <meta property="og:image" content="{{ get_url(path=og_image) }}">
+    <meta property="og:site_name" content="{{ config.title }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="{{ get_url(path=og_image) }}">
+    {% if page is defined and page.date %}<meta property="article:published_time" content="{{ page.date }}">{% endif %}
+    {% if page is defined and page.updated %}<meta property="article:modified_time" content="{{ page.updated }}">{% endif %}
+    {% if page is defined and page.taxonomies is defined %}{% for tag in page.taxonomies.tags | default(value=[]) %}<meta property="article:tag" content="{{ tag }}">{% endfor %}{% endif %}
+    {% endif %}
+
+    {% if rd.global.google_analytics.enable %}
+    <!-- Google tag (gtag.js) -->
+    <script src="https://www.googletagmanager.com/gtag/js?id={{ rd.global.google_analytics.id }}"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ rd.global.google_analytics.id }}');
+    </script>
+    {% endif %}
+
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="{{ get_url(path=rd.defaults.favicon) }}" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ get_url(path=rd.defaults.favicon) }}">
+    <meta name="theme-color" content="{{ rd.colors.primary }}">
+
+    <!--- Page Info-->
+    <title>{% block title %}{% if page is defined and page.title %}{{ page.title }} | {% elif section is defined and section.title %}{{ section.title }} | {% elif term is defined %}{{ term.name }} | {% endif %}{{ rd.info.title | default(value=config.title) }}{% endblock title %}</title>
+
+    <link rel="stylesheet" href="{{ get_url(path='fonts/Chillax/chillax.css') }}">
+
+    <!--- Inject Part-->
+    {% if rd.inject.enable %}
+        {% for item in rd.inject.head %}
+            {% if item %}{{ item | replace(from="<script", to="<script data-swup-reload-script") | safe }}{% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <link rel="stylesheet" href="{{ get_url(path='css/style.css') }}">
+    <link rel="stylesheet" href="{{ get_url(path='css/tailwind.css') }}">
+
+    <link rel="stylesheet" href="{{ get_url(path='fonts/GeistMono/geist-mono.css') }}">
+    <link rel="stylesheet" href="{{ get_url(path='fonts/Geist/geist.css') }}">
+
+    <!--- 语法高亮（giallo class 模式，zola 构建时生成） -->
+    <link id="giallo-light" rel="stylesheet" href="{{ get_url(path='giallo-light.css') }}">
+    <link id="giallo-dark" rel="stylesheet" href="{{ get_url(path='giallo-dark.css') }}">
+    <script>
+        (function() {
+            let isDark = null;
+            try {
+                const saved = JSON.parse(localStorage.getItem("REDEFINE-THEME-STATUS"));
+                if (saved && typeof saved.isDark === "boolean") isDark = saved.isDark;
+            } catch (e) {}
+            if (isDark === null) {
+                isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            }
+            const sync = () => {
+                const dark = document.documentElement.classList.contains("dark");
+                const l = document.getElementById("giallo-light");
+                const d = document.getElementById("giallo-dark");
+                if (l && d) {
+                    l.disabled = dark;
+                    d.disabled = !dark;
+                }
+            };
+            if (isDark !== null) {
+                document.documentElement.classList.add(isDark ? "dark" : "light");
+                document.documentElement.classList.remove(isDark ? "light" : "dark");
+            }
+            sync();
+            new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        })();
+    </script>
+
+    <!--- Font Part-->
+    {% if rd.home_banner.custom_font.enable %}
+    <link href="{{ rd.home_banner.custom_font.url }}" rel="stylesheet">
+    {% endif %}
+    {% if rd.articles.code_block.font.enable %}
+    <link href="{{ rd.articles.code_block.font.url }}" rel="stylesheet">
+    {% endif %}
+    {% if rd.global.fonts.chinese.enable %}
+    <link href="{{ rd.global.fonts.chinese.url }}" rel="stylesheet">
+    {% endif %}
+    {% if rd.global.fonts.english.enable %}
+    <link href="{{ rd.global.fonts.english.url }}" rel="stylesheet">
+    {% endif %}
+    {% if rd.global.fonts.title.enable %}
+    <link href="{{ rd.global.fonts.title.url }}" rel="stylesheet">
+    {% endif %}
+    {% if rd.global.preloader.enable %}
+    <script src="{{ get_url(path='js/build/libs/anime.min.js') }}"></script>
+    {% endif %}
+
+    <!--- JS 运行时配置（对应原主题 export_config()） -->
+    {% set i18n_lang = config.default_language %}
+    {% if lang is defined %}{% set i18n_lang = lang %}{% endif %}
+    {% set hostname = config.base_url | regex_replace(pattern="^[a-zA-Z]+://", rep="") | split(pat="/") | first %}
+    {% set root = config.base_url | regex_replace(pattern="^[a-zA-Z]+://", rep="") | regex_replace(pattern="^" ~ hostname, rep="") %}
+    {% set root = root | regex_replace(pattern="/$", rep="") %}
+    <script id="hexo-configurations">
+    window.config = {
+        hostname: {{ hostname | json_encode | safe }},
+        root: "{{ root }}/",
+        language: {{ config.default_language | json_encode | safe }},
+        path: "/search_index.{{ config.default_language }}.json"
+    };
+    window.theme = {{ rd | json_encode | safe }};
+    window.data = { masonry: {{ rd.masonry | default(value=false) | json_encode | safe }} };
+    </script>
+    <script src="{{ get_url(path='js/i18n/' ~ i18n_lang ~ '.js') }}"></script>
+
+    <!--- Fontawesome Part-->
+    <link rel="stylesheet" href="{{ get_url(path='fontawesome/fontawesome.min.css') }}">
+    <link rel="stylesheet" href="{{ get_url(path='fontawesome/brands.min.css') }}">
+    <link rel="stylesheet" href="{{ get_url(path='fontawesome/solid.min.css') }}">
+    <link rel="stylesheet" href="{{ get_url(path='fontawesome/regular.min.css') }}">
+    {% if rd.fontawesome.thin %}<link rel="stylesheet" href="{{ get_url(path='fontawesome/thin.min.css') }}">{% endif %}
+    {% if rd.fontawesome.light %}<link rel="stylesheet" href="{{ get_url(path='fontawesome/light.min.css') }}">{% endif %}
+    {% if rd.fontawesome.duotone %}<link rel="stylesheet" href="{{ get_url(path='fontawesome/duotone.min.css') }}">{% endif %}
+    {% if rd.fontawesome.sharp_solid %}<link rel="stylesheet" href="{{ get_url(path='fontawesome/sharp-solid.min.css') }}">{% endif %}
+
+    {# 主题配置驱动的 CSS 变量覆盖（对应原主题 Stylus 的 hexo-config 注入） #}
+    <style>
+        :root {
+            --primary-color: {{ rd.colors.primary }};
+            --nav-color-1: {{ rd.navbar.color.left }}{{ rd.navbar.color.transparency }};
+            --nav-color-2: {{ rd.navbar.color.right }}{{ rd.navbar.color.transparency }};
+            --nav-color-bg: linear-gradient(120deg, var(--nav-color-1) 0%, var(--nav-color-2) 100%);
+            --home-banner-text-color: {{ rd.home_banner.text_color.light }};
+            --home-banner-text-color-dark: {{ rd.home_banner.text_color.dark }};
+            --content-max-width: {{ rd.global.content_max_width }};
+            --usr-img-border-radius: {{ rd.articles.style.image_border_radius }};
+            --article-font-size: {{ rd.articles.style.font_size }};
+            --article-line-height: {{ rd.articles.style.line_height }};
+        }
+        .light {
+            --primary-color: {{ rd.colors.primary }};
+            --home-banner-text-color: {{ rd.home_banner.text_color.light }};
+        }
+        .dark {
+            --primary-color: {{ rd.colors.primary }};
+            --home-banner-text-color: {{ rd.home_banner.text_color.dark }};
+        }
+        .main-content {
+            max-width: {{ rd.global.content_max_width }};
+        }
+        {% if rd.articles.style.title_alignment == "center" %}
+        .article-title-regular { text-align: center; width: 100%; }
+        {% endif %}
+    </style>
+</head>
+<body>
+	{% block content %}
+	{% include "partials/progress-bar.html" %}
+	{% if rd.global.preloader.enable %}
+	{% include "partials/preloader.html" %}
+	{% endif %}
+	<main class="page-container" id="swup">
+
+		{% block banner %}{% endblock banner %}
+
+		<div class="main-content-container flex flex-col justify-between min-h-dvh">
+			<div class="main-content-header">
+				{% include "partials/navbar.html" %}
+			</div>
+
+			<div class="main-content-body transition-fade-up">
+				{% block sidebar_left %}{% endblock sidebar_left %}
+
+				<div class="main-content">
+					{% block main %}{% endblock main %}
+				</div>
+
+				{% block sidebar_right %}{% endblock sidebar_right %}
+			</div>
+
+			<div class="main-content-footer">
+				{% include "partials/footer.html" %}
+			</div>
+		</div>
+
+		{% block post_tools %}{% endblock post_tools %}
+
+		<div class="right-side-tools-container">
+			{% include "partials/side-tools.html" %}
+		</div>
+
+		{% include "partials/image-viewer.html" %}
+
+		{% if rd.navbar.search.enable %}
+		{% include "partials/local-search.html" %}
+		{% endif %}
+
+	</main>
+
+	{% if rd.global.single_page %}
+	{% include "partials/swup.html" %}
+	{% endif %}
+	{% endblock content %}
+	{% include "partials/scripts.html" %}
+</body>
+
+</html>

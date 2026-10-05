@@ -1,0 +1,5 @@
+[
+  { "title": "Light", "image": "/images/wallhaven-wqery6-light.webp", "width": 1920, "height": 1080 },
+  { "title": "Dark", "image": "/images/wallhaven-wqery6-dark.webp", "width": 1920, "height": 1080 },
+  { "title": "Redefine", "image": "/images/redefine-og.webp", "width": 1280, "height": 640 }
+]

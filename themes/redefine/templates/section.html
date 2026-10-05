@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="page-template-container">
+	<div class="page-template-content markdown-body">
+		<h1>{{ section.title | default(value=config.title) }}</h1>
+		{{ section.content | safe }}
+		<ul class="section-page-list mt-4">
+			{% for p in section.pages %}
+			<li class="my-2 text-lg">
+				<a class="text-lg" href="{{ p.permalink }}">{{ p.title }}</a>
+				{% if p.date %}<span class="text-third-text-color text-sm ml-2">{{ p.date | date(format="%Y-%m-%d") }}</span>{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+{% if paginator is defined %}
+{% include "partials/paginator.html" %}
+{% endif %}
+{% endblock main %}

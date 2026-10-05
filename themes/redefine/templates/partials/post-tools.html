@@ -1,0 +1,18 @@
+{% set rd = config.extra.redefine %}
+<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		{% if rd.articles.toc.enable %}
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		{% endif %}
+
+		<!-- go comment -->
+		{% if rd.comment.enable and rd.comment.system and page.extra.comment != false %}
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		{% endif %}
+	</ul>
+</div>

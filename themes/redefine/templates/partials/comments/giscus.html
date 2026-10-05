@@ -1,0 +1,88 @@
+{% set rd = config.extra.redefine %}
+{% set gc = rd.comment.config.giscus %}
+{% if rd.comment.system == "giscus" and gc.repo and gc.repo_id and gc.category_id %}
+    <div id="giscus-container"></div>
+    <script {% if rd.global.single_page %}data-swup-reload-script{% endif %} defer>
+        (function() {
+            const containerId = "giscus-container";
+            const mapping = "{{ gc.mapping | default(value='pathname') }}";
+            const lang = "{{ gc.lang | default(value='en') }}";
+            const inputPosition = "{{ gc.input_position | default(value='bottom') }}";
+            const reactionsEnabled = "{{ gc.reactions_enabled | default(value='1') }}" === "1";
+            const emitMetadata = "{{ gc.emit_metadata | default(value='1') }}" === "1";
+            const strict = "{{ gc.strict | default(value='0') }}" === "1";
+            const loading = "{{ gc.loading | default(value='lazy') }}";
+
+            const getTerm = () => {
+                if (mapping === "pathname") return location.pathname;
+                if (mapping === "url") return location.href;
+                if (mapping === "title") return document.title;
+                if (mapping === "og:title") {
+                    const ogTitle = document.querySelector("meta[property='og:title']");
+                    return ogTitle?.content || document.title;
+                }
+                return "";
+            };
+
+            const sendUpdate = () => {
+                const iframe = document.querySelector("iframe.giscus-frame");
+                if (!iframe) return;
+                const setConfig = {
+                    theme: "preferred_color_scheme",
+                    lang,
+                    inputPosition,
+                    reactionsEnabled,
+                    emitMetadata,
+                    strict,
+                };
+                if (mapping !== "number") {
+                    const term = getTerm();
+                    if (term) setConfig.term = term;
+                }
+                iframe.contentWindow.postMessage({ giscus: { setConfig } }, "https://giscus.app");
+            };
+
+            const loadGiscus = () => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const iframe = container.querySelector("iframe.giscus-frame");
+                if (iframe) { sendUpdate(); return; }
+                if (container.dataset.giscusInit === "true") return;
+
+                const giscusConfig = {
+                    src: "https://giscus.app/client.js",
+                    "data-repo": "{{ gc.repo }}",
+                    "data-repo-id": "{{ gc.repo_id }}",
+                    "data-category": "{{ gc.category }}",
+                    "data-category-id": "{{ gc.category_id }}",
+                    "data-mapping": mapping,
+                    "data-strict": "{{ gc.strict | default(value='0') }}",
+                    "data-reactions-enabled": "{{ gc.reactions_enabled | default(value='1') }}",
+                    "data-emit-metadata": "{{ gc.emit_metadata | default(value='1') }}",
+                    "data-theme": "preferred_color_scheme",
+                    "data-lang": lang,
+                    "data-input-position": inputPosition,
+                    "data-loading": loading,
+                    crossorigin: "anonymous",
+                    async: true,
+                };
+
+                const giscusScript = document.createElement("script");
+                for (const key in giscusConfig) {
+                    giscusScript.setAttribute(key, giscusConfig[key]);
+                }
+                container.appendChild(giscusScript);
+                container.dataset.giscusInit = "true";
+            };
+
+            const runGiscus = () => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                if (container.querySelector("iframe.giscus-frame")) { sendUpdate(); return; }
+                loadGiscus();
+            };
+
+            runGiscus();
+        })();
+    </script>
+{% endif %}

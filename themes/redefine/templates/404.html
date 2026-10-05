@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}404 | {{ rd.info.title | default(value=config.title) }}{% endblock title %}
+
+{% block content %}
+{% include "partials/progress-bar.html" %}
+<main class="page-container" id="swup">
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			{% include "partials/navbar.html" %}
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			<div class="main-content">
+				<div class="nf-container">
+					<div class="nf-text">
+						<h1>404<br>Page Not Found</h1>
+					</div>
+					<div class="nf-button">
+						<a href="{{ config.base_url }}" class="button large center"><i class="fa-regular fa-house"></i> {{ trans(key='go-back-home') }}</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="main-content-footer">
+			{% include "partials/footer.html" %}
+		</div>
+	</div>
+
+	<div class="right-side-tools-container">
+		{% include "partials/side-tools.html" %}
+	</div>
+
+	{% include "partials/image-viewer.html" %}
+
+	{% if rd.navbar.search.enable %}
+	{% include "partials/local-search.html" %}
+	{% endif %}
+</main>
+
+{% if rd.global.single_page %}
+{% include "partials/swup.html" %}
+{% endif %}
+{% endblock content %}

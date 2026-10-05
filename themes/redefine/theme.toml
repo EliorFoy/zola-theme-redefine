@@ -1,0 +1,28 @@
+name = "redefine"
+description = "Fast, Pure, Elegant — Zola port of the Hexo theme Redefine"
+license = "GPL-3.0"
+homepage = "https://github.com/evannotfound/hexo-theme-redefine"
+min_version = "0.23.0"
+demo = ""
+
+[extra.redefine]
+# Default theme options mirror the upstream hexo _config.yml.
+# Site owners override them in their own config.toml under [extra.redefine].
+version = "2.9.0"
+masonry = false
+
+[extra.redefine.info]
+title = "Theme Redefine"
+subtitle = "Redefine Your Zola Journey."
+author = "The Redefine Team"
+url = ""
+
+[extra.redefine.defaults]
+favicon = "/images/redefine-favicon.svg"
+logo = ""
+avatar = "/images/redefine-avatar.svg"
+
+[extra.redefine.colors]
+primary = "#A31F34"
+secondary = ""
+default_mode = "light"

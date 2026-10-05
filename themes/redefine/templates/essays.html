@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} | {{ rd.info.title | default(value=config.title) }}{% endblock title %}
+
+{% block main %}
+{% set essays = rd.essays | default(value=[]) %}
+<div class="mb-4">
+	<h1 class="page-title-header">{{ page.title }}</h1>
+	<ul class="flex flex-col mb-4 gap-6">
+		{% for e in essays %}
+		<li class="w-full flex flex-row relative">
+			<div class="w-10 h-10 mr-4 rounded-lg overflow-hidden border border-border-color p-[1px] shrink-0">
+				<img class="w-full h-full rounded-[6.2px]" src="{{ get_url(path=rd.defaults.avatar) }}" alt="avatar" />
+			</div>
+			<div class="w-full border-border-color rounded-xl rounded-tl-none shadow-redefine-flat overflow-hidden">
+				<div class="essay-date px-4 py-1.5 text-sm border-b border-border-color bg-zinc-50 dark:bg-zinc-800 text-third-text-color" data-date="{{ e.date }}">{{ e.date }}</div>
+				<div id="shuoshuo-content" class="px-4 py-2">{{ e.content | safe }}</div>
+			</div>
+			<div class="absolute left-[50.5px] top-3 transform w-2 h-2 border-solid border-t border-l bg-zinc-50 -rotate-45 border-border-color dark:bg-zinc-800"></div>
+		</li>
+		{% endfor %}
+	</ul>
+
+	<div class="page-template-content markdown-body">
+		{{ page.content | safe }}
+	</div>
+</div>
+{% endblock main %}

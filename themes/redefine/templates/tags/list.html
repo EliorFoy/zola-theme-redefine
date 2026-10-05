@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ trans(key='tags') }} | {{ rd.info.title | default(value=config.title) }}{% endblock title %}
+
+{% block main %}
+{% if terms | length > 0 %}
+	<h1 class="page-title-header">
+		{{ trans(key='tags') }}
+	</h1>
+
+	{% if rd.page_templates.tags_style == "cloud" %}
+	<div class="tagcloud-content">
+		{% set last_term = terms | sort(attribute="page_count") | last %}
+		{% set max_count = last_term.page_count %}
+		{% if max_count < 1 %}{% set max_count = 1 %}{% endif %}
+		{% for t in terms %}
+			{% set size = 1.0 + 4.0 * (t.page_count | float) / (max_count | float) %}
+			<a style="font-size: {{ size | round(precision=2) }}rem;" href="{{ t.permalink }}">{{ t.name }}</a>
+		{% endfor %}
+	</div>
+
+	{% else %}
+	<div class="tagcloud-content">
+		<ul class="tag-list" data-show-value="true">
+			{% for t in terms %}
+				{% set weight = t.page_count %}
+				{% if weight > 5 %}{% set weight = 5 %}{% endif %}
+				<li>
+					<a data-weight="{{ weight }}" href="{{ t.permalink }}">
+						<i class="fa-solid fa-hashtag"></i>{{ t.name }}
+					</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+	{% endif %}
+{% endif %}
+{% endblock main %}

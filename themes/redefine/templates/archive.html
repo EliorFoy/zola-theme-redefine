@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}{{ trans(key='archive') }} | {{ rd.info.title | default(value=config.title) }}{% endblock title %}
+
+{% block main %}
+{% set root_section = get_section(path="_index.md") %}
+{% set posts = root_section.pages %}
+{% include "partials/posts-list.html" %}
+{% endblock main %}

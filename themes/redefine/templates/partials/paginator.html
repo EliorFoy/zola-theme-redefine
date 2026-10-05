@@ -1,0 +1,37 @@
+{# 分页器：还原 hexo paginator() 的 DOM 结构（从上下文读取 paginator 变量） #}
+{% if paginator is defined %}
+<div class="paginator">
+  {% set total = paginator.number_pagers %}
+  {% set cur = paginator.current_index %}
+  {% if cur > 1 %}
+  <a class="extend prev" rel="prev" href="{% if cur == 2 %}{{ paginator.first }}{% else %}{{ paginator.first }}page/{{ cur - 1 }}/{% endif %}"><i class="fa-regular fa-angle-left"></i></a>
+  {% endif %}
+  {# 页码窗口：当前页前后各 2 页 #}
+  {% set start = cur - 2 %}
+  {% if start < 1 %}{% set start = 1 %}{% endif %}
+  {% set end = cur + 2 %}
+  {% if end > total %}{% set end = total %}{% endif %}
+  {% if start > 1 %}
+  <a class="page-number" href="{{ paginator.first }}">1</a>
+  {% if start > 2 %}<span class="space">…</span>{% endif %}
+  {% endif %}
+  {% for n in range(start=1, end=total + 1) %}
+    {% if n >= start and n <= end %}
+      {% if n == cur %}
+        <span class="page-number current">{{ n }}</span>
+      {% elif n == 1 %}
+        <a class="page-number" href="{{ paginator.first }}">1</a>
+      {% else %}
+        <a class="page-number" href="{{ paginator.first }}page/{{ n }}/">{{ n }}</a>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% if end < total %}
+    {% if end < total - 1 %}<span class="space">…</span>{% endif %}
+  <a class="page-number" href="{{ paginator.first }}page/{{ total }}/">{{ total }}</a>
+  {% endif %}
+  {% if cur < total %}
+  <a class="extend next" rel="next" href="{{ paginator.first }}page/{{ cur + 1 }}/"><i class="fa-regular fa-angle-right"></i></a>
+  {% endif %}
+</div>
+{% endif %}

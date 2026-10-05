@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}{{ trans(key='category') }}: {{ term.name }} | {{ rd.info.title | default(value=config.title) }}{% endblock title %}
+
+{% block main %}
+{% set posts = term.pages %}
+<div class="category-name">
+    <i class="fa-solid fa-folder"></i>&nbsp;{{ term.name }}
+</div>
+<div class="category-post-list">
+    {% include "partials/posts-list.html" %}
+</div>
+{% endblock main %}

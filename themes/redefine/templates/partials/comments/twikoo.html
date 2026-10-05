@@ -1,0 +1,42 @@
+{% set rd = config.extra.redefine %}
+{% set tc = rd.comment.config.twikoo %}
+{% if rd.comment.system == "twikoo" and tc.server_url %}
+    <div class="twikoo-container">
+        <script {% if rd.global.single_page %}data-swup-reload-script{% endif %}
+                src='https://cdnjs.cloudflare.com/ajax/libs/twikoo/{{ tc.version | default(value="1.6.10") }}/twikoo.all.min.js'
+        ></script>
+        <div id="twikoo-comment"></div>
+        <script {% if rd.global.single_page %}data-swup-reload-script{% endif %}>
+            (function() {
+                const startPath = location.pathname;
+                const startTime = Date.now();
+                const retryDelay = 200;
+                const retryLimit = 5000;
+
+                const runTwikoo = () => {
+                    if (location.pathname !== startPath) {
+                        return;
+                    }
+
+                    const container = document.getElementById('twikoo-comment');
+                    if (!container || typeof twikoo === 'undefined') {
+                        if (Date.now() - startTime < retryLimit) {
+                            setTimeout(runTwikoo, retryDelay);
+                        }
+                        return;
+                    }
+
+                    container.innerHTML = '';
+                    twikoo.init({
+                        el: '#twikoo-comment',
+                        envId: '{{ tc.server_url }}',
+                        {% if tc.region %}region: '{{ tc.region }}',{% endif %}
+                        path: location.pathname,
+                    });
+                };
+
+                runTwikoo();
+            })();
+        </script>
+    </div>
+{% endif %}

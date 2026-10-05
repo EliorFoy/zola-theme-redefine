@@ -1,0 +1,152 @@
+{% set rd = config.extra.redefine %}
+<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar {% if home_first %}has-home-banner{% endif %}">
+        <div class="left">
+            {% if rd.defaults.logo %}
+                <a class="logo-image h-8 w-8 sm:w-10 sm:h-10 mr-3" href="{{ config.base_url }}">
+                    <img src="{{ get_url(path=rd.defaults.logo) }}" class="w-full h-full rounded-xs" />
+                </a>
+            {% endif %}
+            <a class="logo-title" href="{{ config.base_url }}">
+                {%- if home_first -%}<h1>{%- endif -%}
+                {{ rd.info.title | default(value=config.title) }}
+                {%- if home_first -%}</h1>{%- endif -%}
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    {% for link in rd.navbar.links %}
+                        {% if link.path != "none" %}
+                            {% set has_submenus = link.submenus is defined and link.submenus | length > 0 %}
+                            {% set link_href = "#" %}
+                            {% if not has_submenus %}{% set link_href = get_url(path=link.path) %}{% endif %}
+                            {% set is_active = false %}
+                            {% if current_path is defined %}
+                                {% set is_active = current_path == link.path %}
+                                {% if not is_active and link.path != "/" and link.path != "#" %}
+                                    {% set is_active = current_path | split(pat=link.path) | length > 1 %}
+                                {% endif %}
+                            {% endif %}
+                            <li class="navbar-item">
+                                <a class="{% if has_submenus %}has-dropdown{% elif is_active %}active{% endif %}" href="{{ link_href }}" {% if has_submenus %}onClick="return false;"{% endif %}>
+                                    {%- if link.icon %}<i class="{{ link.icon }} fa-fw"></i>{% endif -%}
+                                    {{ trans(key=link.name) | default(value=link.name) | upper }}
+                                    {%- if has_submenus %}<i class="fa-solid fa-chevron-down fa-fw"></i>{% endif -%}
+                                </a>
+
+                                {% if has_submenus %}
+                                    <ul class="sub-menu">
+                                        {% for sub in link.submenus %}
+                                        <li>
+                                            <a href="{{ get_url(path=sub.path) }}">{{ trans(key=sub.name) | default(value=sub.name) | upper }}</a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if rd.navbar.search.enable %}
+                    <li class="navbar-item search search-popup-trigger">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                {% if rd.navbar.search.enable %}
+                <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                {% endif %}
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            {% for link in rd.navbar.links %}
+                {% if link.path != "none" %}
+                    {% set has_submenus = link.submenus is defined and link.submenus | length > 0 %}
+                    {% set is_active = false %}
+                    {% if current_path is defined %}
+                        {% set is_active = current_path == link.path %}
+                        {% if not is_active and link.path != "/" and link.path != "#" %}
+                            {% set is_active = current_path | split(pat=link.path) | length > 1 %}
+                        {% endif %}
+                    {% endif %}
+                    {% set link_href = "#" %}
+                    {% if not has_submenus %}{% set link_href = get_url(path=link.path) %}{% endif %}
+                    {% set drawer_class = "drawer-navbar-item" %}
+                    {% if has_submenus %}{% set drawer_class = "drawer-navbar-item-sub" %}{% endif %}
+
+                    <li class="{{ drawer_class }} text-base my-1.5 flex flex-col w-full">
+                        {% if has_submenus %}
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full {% if is_active %}active{% endif %}"
+                             navbar-data-toggle="submenu-{{ loop.index }}"
+                        >
+                            <span>
+                                {{ trans(key=link.name) | default(value=link.name) | upper }}
+                            </span>
+                            {% if link.icon %}
+                            <i class="fa-solid fa-chevron-right fa-sm fa-fw transition-all"></i>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full {% if is_active %}active{% endif %}"
+                           href="{{ link_href }}"
+                        >
+                            <span>
+                                {{ trans(key=link.name) | default(value=link.name) | upper }}
+                            </span>
+                            {% if link.icon %}
+                            <i class="{{ link.icon }} fa-sm fa-fw"></i>
+                            {% endif %}
+                        </a>
+                        {% endif %}
+
+                        {% if has_submenus %}
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-{{ loop.index }}">
+                                {% for sub in link.submenus %}
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class="text-third-text-color text-xl" href="{{ get_url(path=sub.path) }}">{{ trans(key=sub.name) | default(value=sub.name) | upper }}</a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {# 侧栏链接追加到移动端菜单（跳过与导航栏重复的项） #}
+            {% if rd.home.sidebar.links and rd.home.sidebar.show_on_mobile %}
+                {% set nav_json = rd.navbar.links | json_encode %}
+                {% for slink in rd.home.sidebar.links %}
+                    {% set marker = '"name":"' ~ slink.name ~ '"' %}
+                    {% if nav_json | split(pat=marker) | length == 1 %}
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                           href="{{ get_url(path=slink.path) }}"
+                        >
+                            <span>{{ trans(key=slink.name) | default(value=slink.name) }}</span>
+                            {% if slink.icon %}<i class="{{ slink.icon }} fa-sm fa-fw"></i>{% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </ul>
+
+        {% include "partials/statistics.html" %}
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>

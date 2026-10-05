@@ -1,0 +1,58 @@
+{% set rd = config.extra.redefine %}
+<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        {% set fmt = "%Y-%m-%d" %}
+        {% if is_post and page.date | date(format="%H:%M") != "00:00" %}{% set fmt = "%Y-%m-%d %H:%M" %}{% endif %}
+        <span class="desktop">{{ page.date | date(format=fmt) }}</span>
+        <span class="mobile">{{ page.date | date(format=fmt) }}</span>
+        <span class="hover-info">{{ trans(key='create_time') }}</span>
+    </span>
+    {% if page.updated and page.updated != page.date %}
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">{{ page.updated | date(format=fmt) }}</span>
+            <span class="mobile">{{ page.updated | date(format=fmt) }}</span>
+            <span class="hover-info">{{ trans(key='update_time') }}</span>
+        </span>
+    {% endif %}
+
+    {% set page_cats = page.taxonomies.categories | default(value=[]) %}
+    {% if page_cats | length > 0 %}
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                {% for cat in page_cats %}
+                    <li>{% if loop.index0 != 0 %}| {% endif %}<a href="{{ get_url(path='/categories/' ~ (cat | slugify) ~ '/') }}">{{ cat }}</a>&nbsp;</li>
+                {% endfor %}
+            </ul>
+        </span>
+    {% endif %}
+    {% set page_tags = page.taxonomies.tags | default(value=[]) %}
+    {% if page_tags | length > 0 %}
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                {% for tag in page_tags %}
+                    <li>{% if loop.index0 != 0 %}| {% endif %}<a href="{{ get_url(path='/tags/' ~ (tag | slugify) ~ '/') }}">{{ tag }}</a>&nbsp;</li>
+                {% endfor %}
+            </ul>
+        </span>
+    {% endif %}
+
+    {% if is_post and rd.articles.word_count.enable and rd.articles.word_count.count %}
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>{{ page.word_count }} {{ trans(key='wordcount') }}</span>
+        </span>
+    {% endif %}
+    {% if is_post and rd.articles.word_count.enable and rd.articles.word_count.min2read %}
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>{{ page.reading_time }} {{ trans(key='min2read') }}</span>
+        </span>
+    {% endif %}
+    {% if is_post and rd.global.website_counter.enable and rd.global.website_counter.post_pv %}
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    {% endif %}
+</div>

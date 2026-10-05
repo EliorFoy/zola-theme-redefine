@@ -1,0 +1,188 @@
+{% set rd = config.extra.redefine %}
+{% if rd.home_banner.style == "fixed" %}
+    <style>
+        .home-banner-container {
+            background: none !important;
+        }
+        .home-article-item,
+        .sidebar-links,
+        .sidebar-content,
+        a.page-number,
+        a.extend,
+        .sidebar-links .links:hover,
+        .right-bottom-tools,
+        footer.footer {
+            background-color: var(--background-color-transparent-80) !important;
+        }
+        .right-bottom-tools:hover,
+        a.page-number:hover,
+        a.extend:hover {
+            background-color: var(--primary-color) !important;
+        }
+        .site-info,
+        .home-article-sticky-label {
+            background-color: var(--background-color-transparent-15) !important;
+        }
+        .home-article-sticky-label {
+            backdrop-filter: none !important;
+        }
+    </style>
+    <div class="home-banner-background transition-fade fixed top-0 left-0 w-screen h-screen scale-125 sm:scale-110 box-border will-change-transform bg-cover">
+        <img src="{{ get_url(path=rd.home_banner.image.light) }}" alt="home-banner-background" class="w-full h-full object-cover dark:hidden">
+        <img src="{{ get_url(path=rd.home_banner.image.dark) }}" alt="home-banner-background" class="w-full h-full object-cover hidden dark:block">
+    </div>
+{% endif %}
+
+<div class="home-banner-container flex justify-center items-center transition-fade relative">
+    {% if rd.home_banner.style != "fixed" %}
+    <div class="home-banner-background transition-fade absolute top-0 left-0 w-screen h-screen scale-125 sm:scale-110 box-border will-change-transform bg-cover">
+        <img src="{{ get_url(path=rd.home_banner.image.light) }}" alt="home-banner-background" class="w-full h-full object-cover dark:hidden">
+        <img src="{{ get_url(path=rd.home_banner.image.dark) }}" alt="home-banner-background" class="w-full h-full object-cover hidden dark:block">
+    </div>
+    {% endif %}
+    <div class="content mt-8 flex flex-col justify-center items-center transition-fade-down">
+        <div class="description flex flex-col justify-center items-center w-screen font-medium text-center"
+        {% if rd.home_banner.custom_font.enable %}
+             style="font-family: '{{ rd.home_banner.custom_font.family }}', sans-serif; !important;"
+                {% endif %}
+        >
+            {{ rd.home_banner.title | default(value=config.description) }}
+            {% set subtitle_cfg = rd.home_banner.subtitle %}
+            {% set subtitle_entries = subtitle_cfg.text | default(value=[]) %}
+            {% if subtitle_entries | length != 0 or subtitle_cfg.hitokoto.enable %}
+                <p><i id="subtitle"></i></p>
+            {% endif %}
+        </div>
+        {% if rd.home_banner.social_links.enable %}
+            {% set social = rd.home_banner.social_links %}
+            {% set links = social.links | default(value=[]) %}
+            {% set qrs = social.qrs | default(value=[]) %}
+            {% set has_qrs = false %}
+            {% for item in qrs %}{% if item.qr %}{% set has_qrs = true %}{% endif %}{% endfor %}
+            <div class="absolute bottom-0.5 flex {% if social.style == "reverse" %}flex-row-reverse{% else %}flex-row{% endif %} {% if social.style == "center" %}justify-center{% else %}justify-between{% endif %} max-w-[1340px] items-center w-full px-8 sm:px-12">
+                <div class="{% if social.style == "center" %}hidden{% else %}flex{% endif %} p-3 bg-gray-300/50 dark:bg-gray-500/40 backdrop-blur-lg border border-white/20 dark:border-gray-500/30 group rounded-full cursor-pointer flex justify-center items-center aspect-square h-full shadow-redefine-flat hover:shadow-redefine-flat-hover transition-shadow" onclick="scrollToMain()" >
+                    <i class="fa-solid fa-arrow-down fa-fw fa-lg group-hover:translate-y-1 transition-transform"></i>
+                </div>
+                <div class="social-contacts px-6 py-3 bg-gray-300/50 dark:bg-gray-500/40 backdrop-blur-lg border border-white/20 dark:border-gray-500/30 shadow-redefine-flat rounded-full flex flex-row gap-3 items-center">
+                    {% for item in links %}
+                        {% if item.url %}
+                            {% set name = item.name | default(value="") %}
+                            {% set icon = item.icon | default(value=name) %}
+                            {% set is_email = false %}
+                            {% if name == "email" %}{% set is_email = true %}{% endif %}
+                            {% if icon | split(pat="fa-at") | length > 1 %}{% set is_email = true %}{% endif %}
+                            {% set icon_is_path = false %}
+                            {% if icon | regex_replace(pattern="^/", rep="Y") == "Y" %}{% set icon_is_path = true %}{% endif %}
+                            {% if icon | regex_replace(pattern="^http", rep="Y") == "Y" %}{% set icon_is_path = true %}{% endif %}
+                            {% set icon_is_fa = false %}
+                            {% if icon | split(pat="fa-") | length > 1 %}{% set icon_is_fa = true %}{% endif %}
+                            {% set resolved_url = item.url %}
+                            {% if is_email %}
+                                {% set is_mailto = false %}
+                                {% if item.url | regex_replace(pattern="^mailto:", rep="Y") == "Y" %}{% set is_mailto = true %}{% endif %}
+                                {% if not is_mailto %}{% set resolved_url = "mailto:" ~ item.url %}{% endif %}
+                            {% endif %}
+                            {% if is_email %}
+                                {% set email_icon = icon %}
+                                {% if not icon_is_fa %}{% set email_icon = "fa-solid fa-at" %}{% endif %}
+                                <span class="social-contact-item {{ name }}">
+                                    <a href="{{ resolved_url }}">
+                                        <i class="{{ email_icon }} fa-fw fa-lg"></i>
+                                    </a>
+                                </span>
+                            {% elif icon_is_fa and not icon_is_path %}
+                                <span class="social-contact-item">
+                                    <a target="_blank" href="{{ resolved_url }}">
+                                        <i class="{{ icon }} fa-fw fa-lg"></i>
+                                    </a>
+                                </span>
+                            {% elif icon_is_path %}
+                                <span class="social-contact-item">
+                                    <a target="_blank" href="{{ resolved_url }}">
+                                        <img src="{{ get_url(path=icon) }}" alt="social-icon" class="w-5 h-5 object-contain">
+                                    </a>
+                                </span>
+                            {% elif name %}
+                                <span class="social-contact-item {{ name }}">
+                                    <a target="_blank" href="{{ resolved_url }}">
+                                        <i class="fa-brands fa-fw fa-lg fa-{{ name }}"></i>
+                                    </a>
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if has_qrs %}
+
+                        <div class="social-links-divider vertical-separator w-[1px] h-4 bg-third-text-color mx-0.5"></div>
+
+                        {% for item in qrs %}
+                            {% if item.qr %}
+                                {% set name = item.name | default(value="") %}
+                                {% set icon = item.icon | default(value=name) %}
+                                {% set icon_is_path = false %}
+                                {% if icon | regex_replace(pattern="^/", rep="Y") == "Y" %}{% set icon_is_path = true %}{% endif %}
+                                {% if icon | regex_replace(pattern="^http", rep="Y") == "Y" %}{% set icon_is_path = true %}{% endif %}
+                                {% set icon_is_fa = false %}
+                                {% if icon | split(pat="fa-") | length > 1 %}{% set icon_is_fa = true %}{% endif %}
+                                {% if icon_is_fa and not icon_is_path %}
+                                    <span class="social-contact-item-qr cursor-pointer group qr-toggle-item">
+                                        <a target="_blank">
+                                            <i class="{{ icon }} fa-fw fa-lg qr-trigger"></i>
+                                            <div class="social-qr-container absolute h-auto bg-background-color-transparent-40 border border-white/20 dark:border-gray-500/30 overflow-hidden rounded-2xl bottom-0 mb-14 right-0 invisible group-hover:visible group-active:visible opacity-0 group-hover:opacity-100 group-active:opacity-100 translate-y-0.5 group-hover:translate-y-0 group-active:translate-y-0 transition-all qr-popup">
+                                                <img class="social-contacts-qr w-64" src="{{ get_url(path=item.qr) }}"/>
+                                            </div>
+                                        </a>
+                                    </span>
+                                {% elif icon_is_path %}
+                                    <span class="social-contact-item-qr cursor-pointer group qr-toggle-item">
+                                        <a target="_blank">
+                                            <img src="{{ get_url(path=icon) }}" alt="social-icon" class="w-5 h-5 object-contain qr-trigger">
+                                            <div class="social-qr-container absolute h-auto bg-background-color-transparent-40 border border-white/20 dark:border-gray-500/30 overflow-hidden rounded-2xl bottom-0 mb-14 right-0 invisible group-hover:visible group-active:visible opacity-0 group-hover:opacity-100 group-active:opacity-100 translate-y-0.5 group-hover:translate-y-0 group-active:translate-y-0 transition-all qr-popup">
+                                                <img class="social-contacts-qr w-64" src="{{ get_url(path=item.qr) }}"/>
+                                            </div>
+                                        </a>
+                                    </span>
+                                {% elif name %}
+                                    <span class="social-contact-item-qr {{ name }} cursor-pointer group qr-toggle-item">
+                                        <a target="_blank">
+                                            <i class="fa-brands fa-fw fa-lg fa-{{ name }} qr-trigger"></i>
+                                            <div class="social-qr-container absolute h-auto bg-background-color-transparent-40 border border-white/20 dark:border-gray-500/30 overflow-hidden rounded-2xl bottom-0 mb-14 right-0 invisible group-hover:visible group-active:visible opacity-0 group-hover:opacity-100 group-active:opacity-100 translate-y-0.5 group-hover:translate-y-0 group-active:translate-y-0 transition-all qr-popup">
+                                                <img class="social-contacts-qr w-64" src="{{ get_url(path=item.qr) }}"/>
+                                            </div>
+                                        </a>
+                                    </span>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <style>
+        .qr-toggle-item.qr-active .qr-popup {
+            visibility: visible !important;
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .qr-toggle-item:focus,
+            .qr-toggle-item:hover {
+                background-color: transparent;
+            }
+
+            .qr-toggle-item .qr-trigger:focus,
+            .qr-trigger:focus,
+            .qr-toggle-item .qr-trigger:hover {
+                background-color: transparent;
+                color: inherit;
+            }
+
+            .qr-popup {
+                visibility: hidden !important;
+                opacity: 0 !important;
+            }
+        }
+    </style>
+</div>

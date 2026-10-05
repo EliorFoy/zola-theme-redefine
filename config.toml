@@ -1,0 +1,460 @@
+# Zola 站点配置 —— hexo-theme-redefine 的 Zola 迁移版
+# 主题文档：themes/redefine/README.md（迁移映射与差异说明）
+
+base_url = "http://127.0.0.1:1111"
+title = "Theme Redefine"
+description = "Redefine Your Zola Journey."
+default_language = "zh"
+theme = "redefine"
+build_search_index = true
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+taxonomies = [
+  { name = "tags", render = true },
+  { name = "categories", render = true },
+]
+
+[markdown]
+# 语法高亮：等价于原主题 articles.code_block.highlight_theme.light/dark
+# 可选主题见 https://github.com/getzola/giallo（github-light / dark-plus / one-dark-pro ...）
+[markdown.highlighting]
+style = "class"
+light_theme = "github-light"
+dark_theme = "dark-plus"
+
+[search]
+index_format = "fuse_json"
+include_title = true
+include_content = true
+
+# =====================================================================
+# 界面文案（对应原主题 languages/*.yml，模板通过 trans() 使用）
+# =====================================================================
+[translations]
+archive = "归档"
+archives = "归档"
+categories = "分类"
+category = "分类"
+tags = "标签"
+tag = "标签"
+posts = "文章"
+read_more = "阅读全文"
+sticky = "置顶"
+toc = "目录"
+comments = "评论"
+search = "搜索"
+prev_posts = "上一篇"
+next_posts = "下一篇"
+wordcount = "字"
+min2read = "分钟"
+create_time = "发布于"
+update_time = "更新于"
+go-back-home = "返回首页"
+image_viewer = "图片查看"
+close = "关闭"
+prev = "上一张"
+next = "下一张"
+home = "首页"
+about = "关于"
+links = "友链"
+friends = "友链"
+bookmarks = "书签"
+rss = "RSS"
+powered_by = "由 %s 驱动"
+theme = "主题"
+runtime = "博客已运行"
+days = "天"
+hours = "小时"
+minutes = "分钟"
+seconds = "秒"
+site_uv = "本站访客数"
+site_pv = "本站总访问量"
+site_posts = "文章总数："
+site_wordcount = "全站字数："
+masonry_loading = "加载中..."
+copyright_title = "本文标题"
+copyright_author = "本文作者"
+copyright_create_time = "发布时间"
+copyright_update_time = "最后更新"
+copyright_link = "本文链接"
+copyright_license_title = "版权声明"
+copyright_all_rights_reserved = "全部版权保留"
+copyright_public_domain = "公有领域"
+copyright_license_content = "本博客所有文章除特别声明外，均采用 %s 许可协议。转载请注明出处！"
+expired = "本文已于 %s 过期"
+
+# =====================================================================
+# 主题配置：结构与原版 hexo-theme-redefine 的 _config.yml 一一对应
+# =====================================================================
+[extra.redefine]
+version = "2.9.0"
+masonry = false
+
+[extra.redefine.info]
+title = "Theme Redefine"
+subtitle = "Redefine Your Zola Journey."
+author = "The Redefine Team"
+url = "http://127.0.0.1:1111"
+
+[extra.redefine.defaults]
+favicon = "/images/redefine-favicon.svg"
+logo = ""
+avatar = "/images/redefine-avatar.svg"
+
+[extra.redefine.colors]
+primary = "#A31F34"
+secondary = ""
+default_mode = "light"
+
+[extra.redefine.fontawesome]
+thin = false
+light = false
+duotone = false
+sharp_solid = false
+
+# ---------------- global ----------------
+[extra.redefine.global]
+content_max_width = "1000px"
+sidebar_width = "210px"
+single_page = true
+
+[extra.redefine.global.fonts.chinese]
+enable = false
+family = ""
+url = ""
+
+[extra.redefine.global.fonts.english]
+enable = false
+family = ""
+url = ""
+
+[extra.redefine.global.fonts.title]
+enable = false
+family = ""
+url = ""
+
+[extra.redefine.global.hover]
+shadow = true
+scale = false
+
+[extra.redefine.global.scroll_progress]
+bar = false
+percentage = true
+
+[extra.redefine.global.website_counter]
+url = "https://cn.vercount.one/js"
+enable = true
+site_pv = true
+site_uv = true
+post_pv = true
+
+[extra.redefine.global.preloader]
+enable = false
+custom_message = ""
+
+[extra.redefine.global.side_tools]
+gear_rotation = true
+auto_expand = false
+
+[extra.redefine.global.open_graph]
+enable = true
+image = "/images/redefine-og.webp"
+description = "Redefine Your Zola Journey."
+
+[extra.redefine.global.google_analytics]
+enable = false
+id = ""
+
+# ---------------- navbar ----------------
+[extra.redefine.navbar]
+auto_hide = false
+
+[extra.redefine.navbar.color]
+left = "#f78736"
+right = "#367df7"
+transparency = 35
+
+[extra.redefine.navbar.width]
+home = "1200px"
+pages = "1000px"
+
+[extra.redefine.navbar.search]
+enable = true
+preload = true
+top_n_per_article = 1
+
+[[extra.redefine.navbar.links]]
+name = "home"
+path = "/"
+icon = "fa-regular fa-house"
+
+[[extra.redefine.navbar.links]]
+name = "archives"
+path = "/archives/"
+icon = "fa-regular fa-archive"
+
+[[extra.redefine.navbar.links]]
+name = "tags"
+path = "/tags/"
+icon = "fa-regular fa-tags"
+
+[[extra.redefine.navbar.links]]
+name = "categories"
+path = "/categories/"
+icon = "fa-regular fa-folder"
+
+[[extra.redefine.navbar.links]]
+name = "friends"
+path = "/friends/"
+icon = "fa-regular fa-user-group"
+
+[[extra.redefine.navbar.links]]
+name = "about"
+path = "/about/"
+icon = "fa-regular fa-user"
+
+# ---------------- home_banner ----------------
+[extra.redefine.home_banner]
+enable = true
+style = "fixed"
+title = "Theme Redefine"
+
+[extra.redefine.home_banner.image]
+light = "/images/wallhaven-wqery6-light.webp"
+dark = "/images/wallhaven-wqery6-dark.webp"
+
+[extra.redefine.home_banner.subtitle]
+text = ["Hi, this is Redefine, a Zola theme.", "Fast, Pure, Elegant.", "Redefine your Zola journey."]
+show_author = false
+api = "https://v1.hitokoto.cn"
+typing_speed = 100
+backing_speed = 80
+starting_delay = 500
+backing_delay = 1500
+loop = true
+smart_backspace = true
+
+[extra.redefine.home_banner.subtitle.hitokoto]
+enable = false
+
+[extra.redefine.home_banner.text_color]
+light = "#fff"
+dark = "#d1d1b6"
+
+[extra.redefine.home_banner.text_style]
+title_size = "2.8rem"
+subtitle_size = "1.5rem"
+line_height = 1.2
+
+[extra.redefine.home_banner.custom_font]
+enable = false
+family = ""
+url = ""
+
+[extra.redefine.home_banner.social_links]
+enable = true
+style = "default"
+
+[[extra.redefine.home_banner.social_links.links]]
+name = "github"
+url = "https://github.com/evannotfound/hexo-theme-redefine"
+
+[[extra.redefine.home_banner.social_links.links]]
+name = "email"
+url = "you@example.com"
+
+# ---------------- home ----------------
+[extra.redefine.home]
+article_date_format = "auto"
+excerpt_length = 200
+
+[extra.redefine.home.sidebar]
+enable = true
+position = "left"
+first_item = "menu"
+announcement = "欢迎来到 Redefine Zola 版"
+show_on_mobile = true
+
+[[extra.redefine.home.sidebar.links]]
+name = "archives"
+path = "/archives/"
+icon = "fa-regular fa-archive"
+
+[[extra.redefine.home.sidebar.links]]
+name = "tags"
+path = "/tags/"
+icon = "fa-regular fa-tags"
+
+[[extra.redefine.home.sidebar.links]]
+name = "categories"
+path = "/categories/"
+icon = "fa-regular fa-folder"
+
+[extra.redefine.home.categories]
+enable = true
+limit = 3
+
+[extra.redefine.home.tags]
+enable = true
+limit = 3
+
+# ---------------- articles ----------------
+[extra.redefine.articles]
+lazyload = true
+pangu_js = false
+
+[extra.redefine.articles.style]
+font_size = "16px"
+line_height = 1.5
+image_border_radius = "14px"
+image_alignment = "center"
+image_caption = false
+link_icon = true
+delete_mask = false
+title_alignment = "left"
+
+[extra.redefine.articles.style.headings_top_spacing]
+h1 = "3.2rem"
+h2 = "2.4rem"
+h3 = "1.9rem"
+h4 = "1.6rem"
+h5 = "1.4rem"
+h6 = "1.3rem"
+
+[extra.redefine.articles.word_count]
+enable = true
+count = true
+min2read = true
+
+[extra.redefine.articles.author_label]
+enable = true
+auto = false
+list = ["Lv1", "Lv2", "Lv3"]
+
+[extra.redefine.articles.code_block]
+copy = true
+style = "mac"
+
+[extra.redefine.articles.code_block.font]
+enable = false
+family = ""
+url = ""
+
+[extra.redefine.articles.toc]
+enable = true
+max_depth = 3
+number = false
+expand = true
+init_open = true
+
+[extra.redefine.articles.copyright]
+enable = true
+default = "cc_by_nc_sa"
+
+[extra.redefine.articles.recommendation]
+enable = true
+title = "推荐阅读"
+limit = 3
+mobile_limit = 2
+placeholder = "/images/wallhaven-wqery6-light.webp"
+
+# ---------------- comment ----------------
+[extra.redefine.comment]
+enable = false
+system = "giscus"
+
+[extra.redefine.comment.config.giscus]
+repo = ""
+repo_id = ""
+category = ""
+category_id = ""
+mapping = "pathname"
+strict = "0"
+reactions_enabled = "1"
+emit_metadata = "0"
+lang = "zh-CN"
+input_position = "bottom"
+loading = "lazy"
+
+# ---------------- footer ----------------
+[extra.redefine.footer]
+runtime = true
+start = "2022/8/17 11:45:14"
+statistics = true
+icon = '<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>'
+customize = ""
+
+[extra.redefine.footer.icp]
+enable = false
+number = ""
+url = ""
+
+# ---------------- inject ----------------
+[extra.redefine.inject]
+enable = false
+
+# ---------------- plugins ----------------
+[extra.redefine.plugins]
+feed = true
+
+[extra.redefine.plugins.aplayer]
+enable = false
+type = "fixed"
+
+[extra.redefine.plugins.mermaid]
+enable = false
+version = "11.4.1"
+
+# ---------------- 说说数据（content/pages/essays.md） ----------------
+[[extra.redefine.essays]]
+date = "2024-10-01 09:30:00"
+content = "今天把 Redefine 主题迁移到了 <b>Zola</b>，构建速度快得出奇！"
+
+[[extra.redefine.essays]]
+date = "2024-09-15 22:10:00"
+content = "秋天的第一杯奶茶，是桂花乌龙。"
+
+# ---------------- page_templates ----------------
+[extra.redefine.page_templates]
+friends_column = 2
+tags_style = "blur"
+
+[extra.redefine.page_templates.masonry]
+batch_size = 12
+initial_batch_size = 24
+
+# ---------------- cdn / developer ----------------
+[extra.redefine.cdn]
+enable = false
+provider = "npmmirror"
+custom_url = ""
+
+[extra.redefine.developer]
+enable = false
+
+# ---------------- 友链页数据（content/friends.md） ----------------
+[[extra.redefine.links]]
+links_category = "友情链接"
+has_thumbnail = false
+
+[[extra.redefine.links.list]]
+name = "EvanNotFound"
+description = "Theme Redefine 作者"
+link = "https://github.com/EvanNotFound"
+
+[[extra.redefine.links.list]]
+name = "Zola"
+description = "一个快速的静态站点生成器"
+link = "https://www.getzola.org"
+
+# ---------------- 书签页数据（content/bookmarks.md） ----------------
+[[extra.redefine.bookmarks]]
+category = "工具"
+icon = "fa-screwdriver-wrench"
+
+[[extra.redefine.bookmarks.items]]
+name = "Zola"
+description = "一站式静态站点生成器"
+image = "https://www.getzola.org/favicon.ico"
+link = "https://www.getzola.org"

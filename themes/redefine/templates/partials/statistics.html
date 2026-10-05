@@ -1,0 +1,18 @@
+{% set rd = config.extra.redefine %}
+{% set tags_taxonomy = get_taxonomy(kind="tags") %}
+{% set categories_taxonomy = get_taxonomy(kind="categories") %}
+{% set root_section = get_section(path="_index.md") %}
+<div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="{{ get_url(path='/tags/') }}">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">{{ tags_taxonomy.items | length }}</div>
+        <div class="label text-third-text-color text-sm">{{ trans(key='tags') }}</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="{{ get_url(path='/categories/') }}">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">{{ categories_taxonomy.items | length }}</div>
+        <div class="label text-third-text-color text-sm">{{ trans(key='categories') }}</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="{{ get_url(path='/archives/') }}">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">{{ root_section.pages | length }}</div>
+        <div class="label text-third-text-color text-sm">{{ trans(key='posts') }}</div>
+    </a>
+</div>

@@ -1,0 +1,24 @@
+{% set rd = config.extra.redefine %}
+<div class="archive-container shadow-none hover:shadow-none sm:shadow-redefine sm:hover:shadow-redefine-hover">
+	{% set post_list = posts | sort(attribute="date") | reverse %}
+	{% set year_groups = post_list | group_by(attribute="year") %}
+	<div class="archive-list-container">
+		{% for year, year_posts in year_groups %}
+			<section class="archive-item mb-spacing-unit last:mb-0">
+				<div class="archive-item-header flex flex-row items-center mb-2">
+					<span class="archive-year font-semibold text-3xl mr-2">{{ year }}</span>
+					<span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">{{ year_posts | length }}</span>
+				</div>
+				<ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
+					{% for post in year_posts %}
+						<li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is="{{ post.date | date(format='%m-%d') }}">
+							<a href="{{ post.permalink }}" class="block w-fit">
+								<span class="article-title my-0.5 text-2xl">{{ post.title }}</span>
+							</a>
+						</li>
+					{% endfor %}
+				</ul>
+			</section>
+		{% endfor %}
+	</div>
+</div>

@@ -1,0 +1,68 @@
+{% set rd = config.extra.redefine %}
+{# 目录：生成与 hexo toc() 一致的 DOM（ol.nav > li.nav-item > a.nav-link）
+   Zola 0.23 不支持 Tera macro，因此用固定 6 层嵌套展开 page.toc 树 #}
+{% set maxd = rd.articles.toc.max_depth | default(value=3) %}
+{% set num = rd.articles.toc.number %}
+<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">{{ trans(key='toc') }}</div>
+		<div class="page-title">{{ page.title }}</div>
+		<ol class="nav">
+			{% for e1 in page.toc %}{% if e1.level <= maxd %}
+			{% set i1 = loop.index %}
+			<li class="nav-item">
+				<a class="nav-link" href="#{{ e1.id }}">{% if num %}<span class="nav-number">{{ i1 }}.</span> {% endif %}<span class="nav-text">{{ e1.title }}</span></a>
+				{% if e1.children | length > 0 and maxd >= 2 %}
+				<ol class="nav-child">
+					{% for e2 in e1.children %}{% if e2.level <= maxd %}
+					{% set i2 = loop.index %}
+					<li class="nav-item">
+						<a class="nav-link" href="#{{ e2.id }}">{% if num %}<span class="nav-number">{{ i1 }}.{{ i2 }}.</span> {% endif %}<span class="nav-text">{{ e2.title }}</span></a>
+						{% if e2.children | length > 0 and maxd >= 3 %}
+						<ol class="nav-child">
+							{% for e3 in e2.children %}{% if e3.level <= maxd %}
+							{% set i3 = loop.index %}
+							<li class="nav-item">
+								<a class="nav-link" href="#{{ e3.id }}">{% if num %}<span class="nav-number">{{ i1 }}.{{ i2 }}.{{ i3 }}.</span> {% endif %}<span class="nav-text">{{ e3.title }}</span></a>
+								{% if e3.children | length > 0 and maxd >= 4 %}
+								<ol class="nav-child">
+									{% for e4 in e3.children %}{% if e4.level <= maxd %}
+									{% set i4 = loop.index %}
+									<li class="nav-item">
+										<a class="nav-link" href="#{{ e4.id }}">{% if num %}<span class="nav-number">{{ i1 }}.{{ i2 }}.{{ i3 }}.{{ i4 }}.</span> {% endif %}<span class="nav-text">{{ e4.title }}</span></a>
+										{% if e4.children | length > 0 and maxd >= 5 %}
+										<ol class="nav-child">
+											{% for e5 in e4.children %}{% if e5.level <= maxd %}
+											{% set i5 = loop.index %}
+											<li class="nav-item">
+												<a class="nav-link" href="#{{ e5.id }}">{% if num %}<span class="nav-number">{{ i1 }}.{{ i2 }}.{{ i3 }}.{{ i4 }}.{{ i5 }}.</span> {% endif %}<span class="nav-text">{{ e5.title }}</span></a>
+												{% if e5.children | length > 0 and maxd >= 6 %}
+												<ol class="nav-child">
+													{% for e6 in e5.children %}{% if e6.level <= maxd %}
+													<li class="nav-item">
+														<a class="nav-link" href="#{{ e6.id }}">{% if num %}<span class="nav-number">{{ i1 }}.{{ i2 }}.{{ i3 }}.{{ i4 }}.{{ i5 }}.{{ loop.index }}.</span> {% endif %}<span class="nav-text">{{ e6.title }}</span></a>
+													</li>
+													{% endif %}{% endfor %}
+												</ol>
+												{% endif %}
+											</li>
+											{% endif %}{% endfor %}
+										</ol>
+										{% endif %}
+									</li>
+									{% endif %}{% endfor %}
+								</ol>
+								{% endif %}
+							</li>
+							{% endif %}{% endfor %}
+						</ol>
+						{% endif %}
+					</li>
+					{% endif %}{% endfor %}
+				</ol>
+				{% endif %}
+			</li>
+			{% endif %}{% endfor %}
+		</ol>
+	</div>
+</div>

@@ -1,0 +1,7 @@
+{% set rd = config.extra.redefine %}
+<div class="author flex flex-col justify-center my-2.5 mx-0">
+    <div class="name">{{ rd.info.author | default(value=config.author) }}</div>
+    {% if rd.articles.author_label.enable %}
+        <div class="label">{% include "partials/author-label.html" %}</div>
+    {% endif %}
+</div>

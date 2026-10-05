@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} | {{ rd.info.title | default(value=config.title) }}{% endblock title %}
+
+{% block main %}
+{% set is_post = true %}
+<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			{% set article_cover = "" %}
+			{% if page.extra.cover is defined and page.extra.cover | split(pat="/") | length > 1 %}
+				{% set article_cover = page.extra.cover %}
+			{% elif page.extra.banner is defined and page.extra.banner | split(pat="/") | length > 1 %}
+				{% set article_cover = page.extra.banner %}
+			{% elif page.extra.thumbnail is defined and page.extra.thumbnail %}
+				{% set article_cover = page.extra.thumbnail %}
+			{% endif %}
+			{% if article_cover %}
+			<img src="{{ get_url(path=article_cover) }}" alt="{{ page.title }}" class="w-full h-60 sm:h-72 md:h-80 object-cover rounded-t-large dark:brightness-75" />
+			<div class="w-full flex items-center absolute bottom-0 {% if rd.articles.style.title_alignment == "center" %}justify-center{% else %}justify-start{% endif %}">
+				<h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-semibold backdrop-blur-lg rounded-xl border border-border-color ">{{ page.title }}</h1>
+			</div>
+			{% else %}
+			<div class="w-full flex items-center pt-6 {% if rd.articles.style.title_alignment == "center" %}justify-center{% else %}justify-start{% endif %}">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">{{ page.title }}</h1>
+			</div>
+			{% endif %}
+		</div>
+
+		{% if rd.info.author or config.author %}
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] shrink-0 rounded-medium border border-border-color p-px">
+				<img src="{{ get_url(path=page.extra.avatar | default(value=rd.defaults.avatar)) }}" alt="avatar" />
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">{% if page.extra.author %}{{ page.extra.author }}{% else %}{{ rd.info.author | default(value=config.author) }}{% endif %}</span>
+					{% if rd.articles.author_label.enable %}
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">{% include "partials/author-label.html" %}</span>
+					{% endif %}
+				</div>
+				<div class="meta-info">
+					{% include "partials/article-info.html" %}
+				</div>
+			</div>
+		</div>
+		{% else %}
+		<div class="article-header-meta-info px-2 sm:px-6 md:px-8">
+			<div class="meta-info">
+				{% include "partials/article-info.html" %}
+			</div>
+		</div>
+		{% endif %}
+
+		{% if page.extra.expires %}
+		<div class="article-expire hidden mt-4 mx-2 sm:mx-6 md:mx-8 callout callout--simple red mb-4 rounded-small shadow-redefine-flat bg-(--callout-bg-color) p-3 pl-1 relative flex flex-row gap-2 items-center" id="expiration-container" data-expires="{{ page.extra.expires }}" data-updated="{{ page.updated }}">
+			<div role="none" class="rounded-full self-stretch w-0.5 bg-(--callout-primary-color) opacity-60 shrink-0"></div>
+			<i class="expire-icon callout__icon fa-solid fa-timer text-(--callout-primary-color) text-base shrink-0"></i>
+			<div class="callout__content markdown-body flex-1 min-w-0">
+				<span class="expire-label text-(--callout-primary-color)" id="expiration-date">{{ trans(key='expired') }}</span>
+			</div>
+		</div>
+		{% endif %}
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			{{ page.content | safe }}
+		</div>
+
+		{% if rd.articles.copyright.enable %}
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			{% include "partials/article-copyright.html" %}
+		</div>
+		{% endif %}
+
+		{% set page_tags = page.taxonomies.tags | default(value=[]) %}
+		{% if page_tags | length > 0 %}
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			{% for tag in page_tags %}
+			<li class="tag-item mx-0.5">
+				<a href="{{ get_url(path='/tags/' ~ (tag | slugify) ~ '/') }}">#{{ tag }}</a>&nbsp;
+			</li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+
+		{% if rd.articles.recommendation.enable %}
+			{% include "partials/recommendation.html" %}
+		{% endif %}
+
+		{% if page.lower or page.higher %}
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			{% if page.lower %}
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="{{ page.lower.permalink }}">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">{{ page.lower.title }}</span>
+						<span class="post-nav-item">{{ trans(key='prev_posts') }}</span>
+					</span>
+				</a>
+			</div>
+			{% endif %}
+			{% if page.higher %}
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="{{ page.higher.permalink }}">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">{{ page.higher.title }}</span>
+						<span class="post-nav-item">{{ trans(key='next_posts') }}</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			{% endif %}
+		</div>
+		{% endif %}
+
+
+		{% if rd.comment.enable and rd.comment.system and page.extra.comment != false %}
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			{% include "partials/comment.html" %}
+		</div>
+		{% endif %}
+	</div>
+
+	{% if rd.articles.toc.enable %}
+	<div class="toc-content-container">
+		{% include "partials/toc.html" %}
+	</div>
+	{% endif %}
+</div>
+{% endblock main %}
+
+{% block post_tools %}
+<div class="post-tools">
+	{% include "partials/post-tools.html" %}
+</div>
+{% endblock post_tools %}

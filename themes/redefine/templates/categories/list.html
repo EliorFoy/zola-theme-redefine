@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ trans(key='categories') }} | {{ rd.info.title | default(value=config.title) }}{% endblock title %}
+
+{% block main %}
+<h1 class="page-title-header">
+	{{ trans(key='categories') }}
+</h1>
+<div class="category-list-content">
+	<ul class="all-category-list">
+		{% for t in terms %}
+		<li class="all-category-list-item">
+			<a class="all-category-list-link" href="{{ t.permalink }}">{{ t.name }}</a>
+			<span class="all-category-list-count">{{ t.page_count }}</span>
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+<div class="category-comments">
+	{% if rd.comment.enable and rd.comment.system %}
+		{% include "partials/comment.html" %}
+	{% endif %}
+</div>
+{% endblock main %}

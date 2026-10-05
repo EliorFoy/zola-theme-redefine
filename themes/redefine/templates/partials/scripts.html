@@ -1,0 +1,25 @@
+{% set rd = config.extra.redefine %}
+<script type="module" src="{{ get_url(path='js/build/main.js') }}"></script>
+
+{% if rd.footer.runtime %}
+<script src="{{ get_url(path='js/build/libs/odometer.min.js') }}"></script>
+<link rel="stylesheet" href="{{ get_url(path='assets/odometer-theme-minimal.css') }}">
+{% endif %}
+
+{% set subtitle_entries = rd.home_banner.subtitle.text | default(value=[]) %}
+{% if subtitle_entries | length != 0 or rd.home_banner.subtitle.hitokoto.enable %}
+<script src="{{ get_url(path='js/build/libs/Typed.min.js') }}"></script>
+{% endif %}
+
+{% if rd.plugins.mermaid.enable %}
+    {% if rd.plugins.mermaid.version == "11.4.1" %}
+    <script src="{{ get_url(path='js/build/libs/mermaid.min.js') }}"></script>
+    {% else %}
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@{{ rd.plugins.mermaid.version }}/dist/mermaid.min.js"></script>
+    {% endif %}
+{% endif %}
+
+<script src="{{ get_url(path='js/build/libs/moment-with-locales.min.js') }}" data-swup-reload-script></script>
+{% if rd.articles.pangu_js %}
+<script src="{{ get_url(path='js/build/libs/pangu.min.js') }}"></script>
+{% endif %}

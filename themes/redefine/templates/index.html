@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}{{ config.title }} - {{ config.extra.redefine.info.subtitle | default(value=config.description) }}{% endblock title %}
+
+{% block banner %}
+	{% if paginator.current_index == 1 %}
+		{% include "partials/home-banner.html" %}
+	{% elif config.extra.redefine.home_banner.style == "fixed" %}
+		{% include "partials/home-background.html" %}
+	{% endif %}
+{% endblock banner %}
+
+{% block sidebar_left %}
+	{% if config.extra.redefine.home.sidebar.enable and config.extra.redefine.home.sidebar.position == "left" %}
+		{% include "partials/home-sidebar.html" %}
+	{% endif %}
+{% endblock sidebar_left %}
+
+{% block main %}
+	{% include "partials/home-content.html" %}
+{% endblock main %}
+
+{% block sidebar_right %}
+	{% if config.extra.redefine.home.sidebar.enable and config.extra.redefine.home.sidebar.position == "right" %}
+		{% include "partials/home-sidebar.html" %}
+	{% endif %}
+{% endblock sidebar_right %}

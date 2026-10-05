@@ -1,0 +1,53 @@
+{% set rd = config.extra.redefine %}
+{% set wc = rd.comment.config.waline %}
+{% if rd.comment.system == "waline" and wc.serverUrl and wc.lang %}
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '{{ get_url(path='js/build/libs/waline.js') }}';
+
+      (function() {
+        const startPath = location.pathname;
+        const startTime = Date.now();
+        const retryDelay = 200;
+        const retryLimit = 5000;
+
+        const runWaline = () => {
+          if (location.pathname !== startPath) {
+            return;
+          }
+
+          const container = document.getElementById('waline');
+          if (!container) {
+            if (Date.now() - startTime < retryLimit) {
+              setTimeout(runWaline, retryDelay);
+            }
+            return;
+          }
+
+          if (window.redefineWalineInstance?.destroy) {
+            window.redefineWalineInstance.destroy();
+          }
+
+          container.innerHTML = '';
+          window.redefineWalineInstance = init({
+            el: '#waline',
+            serverURL: '{{ wc.serverUrl }}',
+            path: location.pathname,
+            dark: 'body[class~="dark-mode"]',
+            reaction: {{ wc.reaction | default(value=false) | json_encode | safe }},
+            requiredMeta: ['nick', 'mail'],
+            emoji: {{ wc.emoji | default(value=[]) | json_encode | safe }},
+            lang: '{{ wc.lang }}',
+            {% if wc.locale is defined %}locale: {{ wc.locale | json_encode | safe }},{% endif %}
+            {% if wc.wordLimit is defined %}wordLimit: {{ wc.wordLimit | json_encode | safe }},{% endif %}
+            {% if wc.pageSize is defined %}pageSize: {{ wc.pageSize | json_encode | safe }},{% endif %}
+            {% if wc.commentSorting is defined %}commentSorting: '{{ wc.commentSorting }}',{% endif %}
+            {% if wc.recaptchaV3Key %}recaptchaV3Key: '{{ wc.recaptchaV3Key }}',{% endif %}
+            {% if wc.turnstileKey %}turnstileKey: '{{ wc.turnstileKey }}',{% endif %}
+          });
+        };
+
+        runWaline();
+      })();
+    </script>
+{% endif %}

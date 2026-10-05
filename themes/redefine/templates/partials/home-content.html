@@ -1,0 +1,95 @@
+{% set rd = config.extra.redefine %}
+<div class="home-content-container">
+    <ul class="home-article-list">
+        {% for post in paginator.pages %}
+            <li class="home-article-item">
+
+                {% if post.extra.sticky %}
+                    <div class="absolute top-[12px] right-[12px] text-[0.7rem] text-third-text-color rounded-medium bg-background-color-transparent-15 backdrop-blur-sm py-[2px] px-[10px] border border-border-color z-3 hover:text-first-text-color cursor-default">
+                        <i class="fa-regular fa-thumbtack mr-[3px] text-[0.65rem]"></i>{{ trans(key='sticky') }}
+                    </div>
+                {% endif %}
+
+                {% set article_thumbnail = "" %}
+                {% if post.extra.thumbnail is defined and post.extra.thumbnail %}
+                    {% set article_thumbnail = post.extra.thumbnail %}
+                {% elif post.extra.cover is defined and post.extra.cover | split(pat="/") | length > 1 %}
+                    {% set article_thumbnail = post.extra.cover %}
+                {% elif post.extra.banner is defined and post.extra.banner | split(pat="/") | length > 1 %}
+                    {% set article_thumbnail = post.extra.banner %}
+                {% endif %}
+
+                {% if post.extra.thumbnail is defined and post.extra.thumbnail != false and article_thumbnail != "" %}
+                    <div id="home-article-thumbnail" class="home-article-thumbnail relative h-[150px] overflow-hidden rounded-t-large">
+                        <a href="{{ post.permalink }}">
+                            <img src="{{ get_url(path=article_thumbnail) }}" alt="{{ post.title }}" class="w-full h-full object-cover dark:brightness-75 transition-all" />
+                        </a>
+                    </div>
+                {% endif %}
+                <div class="flex flex-col gap-5 px-7 pb-7 {% if post.extra.thumbnail is defined and post.extra.thumbnail != false and article_thumbnail != "" %}pt-5{% else %}pt-7{% endif %}">
+                    <h3 class="home-article-title">
+                        <a href="{{ post.permalink }}">
+                            {{ post.title }}
+                        </a>
+                    </h3>
+
+                    <div class="home-article-content markdown-body">
+                        {% if post.extra.excerpt is defined and post.extra.excerpt == "false" %}
+                        {% elif post.extra.excerpt is defined %}
+                            {{ post.extra.excerpt | safe }}
+                        {% elif post.summary %}
+                            {{ post.summary | safe }}
+                        {% else %}
+                            {{ post.content | striptags | truncate(length=rd.home.excerpt_length) }}
+                        {% endif %}
+                    </div>
+
+                    {# 文章元信息 #}
+                    <div class="home-article-meta-info-container">
+                        <div class="home-article-meta-info">
+                            <span><i class="fa-solid fa-calendars"></i>&nbsp;
+                                {% set fmt = rd.home.article_date_format %}
+                                {% if fmt == "auto" or fmt == "relative" or fmt == "date" %}{% set fmt = "%Y-%m-%d" %}{% else %}{% set fmt = fmt | replace(from="YYYY", to="%Y") | replace(from="MM", to="%m") | replace(from="DD", to="%d") | replace(from="HH", to="%H") | replace(from="mm", to="%M") | replace(from="ss", to="%S") %}{% endif %}
+                                <span class="home-article-date" data-date="{{ post.date }}">
+                                    {{ post.date | date(format=fmt) }}
+                                </span>
+                            </span>
+                            {% set page_cats = post.taxonomies.categories | default(value=[]) %}
+                            {% if page_cats | length > 0 and rd.home.categories.enable %}
+                                <span class="home-article-category">
+                                    <i class="fa-solid fa-folders"></i>&nbsp;
+                                    <ul>
+                                        {% for cat in page_cats %}
+                                            {% if loop.index0 < rd.home.categories.limit or rd.home.categories.limit == 0 %}
+                                            <li>{% if loop.index0 != 0 %}| {% endif %}<a href="{{ get_url(path='/categories/' ~ (cat | slugify) ~ '/') }}">{{ cat }}</a>&nbsp;</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </span>
+                            {% endif %}
+                            {% set page_tags = post.taxonomies.tags | default(value=[]) %}
+                            {% if page_tags | length > 0 and rd.home.tags.enable %}
+                                <span class="home-article-tag">
+                                    <i class="fa-solid fa-tags"></i>&nbsp;
+                                    <ul>
+                                        {% for tag in page_tags %}
+                                            {% if loop.index0 < rd.home.tags.limit or rd.home.tags.limit == 0 %}
+                                            <li>{% if loop.index0 != 0 %}| {% endif %}<a href="{{ get_url(path='/tags/' ~ (tag | slugify) ~ '/') }}">{{ tag }}</a>&nbsp;</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <a href="{{ post.permalink }}">{{ trans(key='read_more') }}<span class="seo-reader-text">{{ post.title }}</span>&nbsp;<i class="fa-solid fa-angle-right"></i></a>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="home-paginator px-7 py-5">
+        {% include "partials/paginator.html" %}
+    </div>
+</div>

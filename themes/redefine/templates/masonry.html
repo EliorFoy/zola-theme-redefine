@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} | {{ rd.info.title | default(value=config.title) }}{% endblock title %}
+
+{% block main %}
+<div class="py-8 sm:py-0">
+	<h1 class="page-title-header">{{ page.title }}</h1>
+
+	<div class="min-h-screen!" id="masonry-container" data-masonry-data-url="{{ get_url(path='masonry/data.json') }}"></div>
+
+	<div class="masonry-loadmore is-hidden" id="masonry-loadmore" aria-live="polite">
+		<span class="masonry-spinner" aria-hidden="true"></span>
+		<span class="masonry-loadmore-text">{{ trans(key='masonry_loading') }}</span>
+	</div>
+
+	<div id="masonry-sentinel" aria-hidden="true"></div>
+</div>
+<script src="{{ get_url(path='js/build/libs/minimasonry.min.js') }}" data-swup-reload-script></script>
+{% endblock main %}

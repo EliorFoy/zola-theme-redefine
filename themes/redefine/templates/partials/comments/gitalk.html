@@ -1,0 +1,49 @@
+{% set rd = config.extra.redefine %}
+{% set gc = rd.comment.config.gitalk %}
+{% if rd.comment.system == "gitalk" and gc.clientID and gc.clientSecret and gc.owner and gc.repo %}
+    <div id="gitalk-container"></div>
+    <script {% if rd.global.single_page %}data-swup-reload-script{% endif %}
+            src="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.8.0/gitalk.min.js"></script>
+    <script {% if rd.global.single_page %}data-swup-reload-script{% endif %}>
+        (function() {
+            const startPath = location.pathname;
+            const startTime = Date.now();
+            const retryDelay = 200;
+            const retryLimit = 5000;
+
+            const runGitalk = () => {
+                if (location.pathname !== startPath) return;
+                const container = document.getElementById('gitalk-container');
+                if (!container || typeof Gitalk === 'undefined') {
+                    if (Date.now() - startTime < retryLimit) setTimeout(runGitalk, retryDelay);
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                let pageKey = decodeURI(location.pathname);
+                const maxLength = 50;
+                if (pageKey.length > maxLength) {
+                    pageKey = pageKey.substring(0, maxLength - 3) + '...';
+                }
+
+                try {
+                    new Gitalk({
+                        clientID: '{{ gc.clientID }}',
+                        clientSecret: '{{ gc.clientSecret }}',
+                        repo: '{{ gc.repo }}',
+                        owner: '{{ gc.owner }}',
+                        admin: ['{{ gc.owner }}'],
+                        id: pageKey,
+                        language: '{{ config.default_language }}',
+                        proxy: '{{ gc.proxy | default(value="https://github.com/login/oauth/access_token") }}'
+                    }).render(container);
+                } catch (e) {
+                    window.Gitalk = null;
+                }
+            };
+
+            runGitalk();
+        })();
+    </script>
+{% endif %}
