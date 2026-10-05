@@ -1,0 +1,36 @@
+{% component tabs(name: string = "tabs", active: integer = 1) %}
+{# 选项卡模块（对应原 {% tabs %} 标签插件，单层）
+   内容中用法：
+   {% <tabs name="demo"> %}
+   <!-- tab 标题一@fa-solid fa-star -->
+   内容一
+   <!-- tab 标题二 -->
+   内容二
+   {% </tabs> %}
+   每段以 <!-- endtab --> 结束（可省略）。active 指定默认激活序号（从 1 开始）。
+   注意：组件输出会再经过一次 Markdown 渲染，因此模板必须输出不含空行的连续 HTML 块。 #}
+{% set chunks = body | split(pat="<!-- tab") %}
+<div class="tabs relative my-4 bg-second-background-color border border-border-color rounded-md" id="tab-{{ name }}"><div role="tablist" aria-orientation="horizontal" class="flex gap-3.5 overflow-x-auto px-4 not-markdown scrollbar-hide" tabindex="0">
+{%- for chunk in chunks %}
+{%- if not loop.first %}
+{%- set head_body = chunk | split(pat="<!-- endtab") | first %}
+{%- set parts = head_body | split(pat="-->") %}
+{%- set header = parts | first | trim %}
+{%- set header_parts = header | split(pat="@") %}
+{%- set caption = header_parts | first | trim %}
+{%- set icon = "" %}
+{%- if header_parts | length > 1 %}{% set icon = header_parts | last | trim %}{% endif %}
+<button type="button" role="tab" aria-selected="{% if loop.index0 == active %}true{% else %}false{% endif %}" data-state="{% if loop.index0 == active %}active{% else %}inactive{% endif %}" data-tab="{{ name }}-{{ loop.index0 }}" class="inline-flex items-center gap-2 whitespace-nowrap text-third-text-color border-b-2 border-transparent py-2 text-sm font-medium transition-colors hover:text-second-text-color data-[state=active]:border-primary data-[state=active]:text-primary" tabindex="{% if loop.index0 == active %}0{% else %}-1{% endif %}">{{ icon | safe }}{{ caption }}</button>
+{%- endif %}
+{%- endfor %}
+</div><div class="tab-content p-4 bg-background-color/70 rounded-md shadow-[0_0_2px_0_var(--shadow-color-1)]">
+{%- for chunk in chunks %}
+{%- if not loop.first %}
+{%- set head_body = chunk | split(pat="<!-- endtab") | first %}
+{%- set parts = head_body | split(pat="-->") %}
+{%- set tab_body = parts | last %}
+<div class="tab-pane" data-state="{% if loop.index0 == active %}active{% else %}inactive{% endif %}" id="{{ name }}-{{ loop.index0 }}"{% if loop.index0 != active %} hidden{% endif %}>{{ tab_body | markdown | safe }}</div>
+{%- endif %}
+{%- endfor %}
+</div></div>
+{% endcomponent tabs %}

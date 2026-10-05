@@ -36,7 +36,7 @@
                     <div class="home-article-content markdown-body">
                         {% if post.extra.excerpt is defined and post.extra.excerpt == "false" %}
                         {% elif post.extra.excerpt is defined %}
-                            {{ post.extra.excerpt | safe }}
+                            {{ post.extra.excerpt | markdown | safe }}
                         {% elif post.summary %}
                             {{ post.summary | safe }}
                         {% else %}

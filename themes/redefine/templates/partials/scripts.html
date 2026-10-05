@@ -23,3 +23,7 @@
 {% if rd.articles.pangu_js %}
 <script src="{{ get_url(path='js/build/libs/pangu.min.js') }}"></script>
 {% endif %}
+{% if rd.plugins.aplayer.enable %}
+<script src="{{ get_url(path='js/build/libs/APlayer.min.js') }}" data-swup-reload-script></script>
+<script src="{{ get_url(path='js/build/plugins/aplayer.js') }}" data-swup-reload-script></script>
+{% endif %}

@@ -1,0 +1,21 @@
+{% component callout(type: string = "default", icon: string = "", title: string = "", class: string = "") %}
+{# Callout 提示模块（对应原 {% callout %} 标签插件）
+   内容中用法（带正文）：
+   {% <callout type="warning" icon="fa-solid fa-triangle-exclamation"> %} 内容 {% </callout> %}
+   提供 title 则渲染带标题样式 #}
+<div class="callout {% if title %}callout--titled{% else %}callout--simple{% endif %} {{ type }} {{ class }} mb-4 rounded-small shadow-redefine-flat bg-(--callout-bg-color) p-3 pl-1 relative flex flex-row gap-2 {% if not title %}items-center{% endif %}">
+  <div role="none" class="rounded-full self-stretch w-0.5 bg-(--callout-primary-color) shrink-0 opacity-60"></div>
+  {% if title %}
+  <div class="flex flex-col gap-2">
+    <div class="callout__title flex items-center gap-2 font-semibold tracking-tight">
+      {%- if icon %}<i class="callout__icon {{ icon }} leading-none text-(--callout-primary-color) text-sm shrink-0"></i> {% endif -%}
+      {{ title | markdown(inline=true) | safe }}
+    </div>
+    <div class="callout__content markdown-body flex-1 min-w-0">{% if body %}{{ body | markdown | safe }}{% endif %}</div>
+  </div>
+  {% else %}
+  {%- if icon %}<i class="callout__icon {{ icon }} leading-none text-(--callout-primary-color) text-sm shrink-0"></i> {% endif -%}
+  <div class="callout__content markdown-body flex-1 min-w-0">{% if body %}{{ body | markdown | safe }}{% endif %}</div>
+  {% endif %}
+</div>
+{% endcomponent callout %}

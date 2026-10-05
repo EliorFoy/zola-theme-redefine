@@ -1,0 +1,8 @@
+{% component mermaid() %}
+{# Mermaid 图表（配合主题 plugins.mermaid 配置；原版由 hexo-filter-mermaid-diagrams 生成 .mermaid 容器）
+   内容中用法：
+   {% <mermaid> %}
+   graph LR; A-->B;
+   {% </mermaid> %} #}
+<div class="mermaid">{{ body }}</div>
+{% endcomponent mermaid %}

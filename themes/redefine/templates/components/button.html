@@ -1,0 +1,16 @@
+{% component button(text: string = "Button", url: string = "#", icon: string = "", image: string = "", size: string = "md", align: string = "", title: string = "", target: string = "", rel: string = "") %}
+{# 按钮模块（对应原 {% button %} / {% btn %} 标签插件）
+   内容中用法：{{<button text="文档" url="https://..." icon="fa-solid fa-book" target="_blank" />}} #}
+{% set size_class = "" %}
+{% if size == "sm" or size == "small" %}{% set size_class = "small" %}{% endif %}
+{% if size == "lg" or size == "large" %}{% set size_class = "large" %}{% endif %}
+{% set align_class = "" %}
+{% if align == "left" or align == "center" or align == "right" %}{% set align_class = align %}{% endif %}
+{% set btn_rel = rel %}
+{% if not btn_rel and target == "_blank" %}{% set btn_rel = "noopener noreferrer" %}{% endif %}
+<a class="button not-markdown {{ size_class }} {{ align_class }}" href="{{ url }}" title="{{ title }}"{% if target %} target="{{ target }}"{% endif %}{% if btn_rel %} rel="{{ btn_rel }}"{% endif %}>
+  {%- if icon %}<i class="{{ icon }}" aria-hidden="true"></i> {% endif -%}
+  {%- if image %}<img src="{{ image }}" alt="{{ text }}" loading="lazy"> {% endif -%}
+  {{- text -}}
+</a>
+{% endcomponent button %}

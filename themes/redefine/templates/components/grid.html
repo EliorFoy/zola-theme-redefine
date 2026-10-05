@@ -1,0 +1,9 @@
+{% component grid(cols: integer = 2, gap: string = "16px", class: string = "") %}
+{# 网格模块（对应原 {% grid %} 标签插件）
+   内容中用法：{% <grid cols=3 gap="16px"> %} 内容 {% </grid> %} #}
+{% set cols_n = cols %}
+{% if cols_n < 2 %}{% set cols_n = 2 %}{% endif %}
+<div class="grid my-4 {{ class }}" style="grid-template-columns: repeat({{ cols_n }}, minmax(0, 1fr)); gap: {{ gap }};">
+{% if body %}{{ body | markdown | safe }}{% endif %}
+</div>
+{% endcomponent grid %}

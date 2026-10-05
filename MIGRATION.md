@@ -38,8 +38,11 @@ zola-theme-redefine/
 
 构建过程的重要发现（供后续维护）：
 
-1. **Zola 0.23 移除了 Tera 的 `import` 与 `macro` 标签** —— 宏只能定义/使用在同一文件内；
-   本主题除 TOC 外全部改用 `{% include %}` 传上下文。
+1. **Zola 0.23 移除了 Tera 的 `import` 与 `macro` 标签，并移除了 shortcodes**——
+   写作模块以 **Tera 2 组件**（`templates/components/*.html`，`{% component 名称(参数) %}…{% endcomponent 名称 %}`
+   定义，内容中以 `{{<name k=v />}}` / `{% <name> %}…{% </name> %}` 调用）重新实现；
+   非字符串参数需 `{2}` 形式；组件输出会再经过一次 Markdown 渲染，模板输出必须
+   是不含空行的连续 HTML 块；除 TOC 外其余 partial 全部改用 `{% include %}`。
 2. **不可用的 Tera 过滤器/test**：`slice`、`map`、`trim_start_matches`、`starting_with`、
    `containing` 等；可用替代：`nth`、`split`、`regex_replace`、`json_encode`、`group_by`。
 3. **`paginator.total_pages`** 在 0.23 中是"内容页数"，分页器页数要用 `number_pagers`。
@@ -48,7 +51,7 @@ zola-theme-redefine/
 
 ## 验证结果（2026-10-05）
 
-- `zola build` 通过：9 页面 + 2 section + atom.xml/sitemap/搜索索引/giallo 双主题 CSS。
+- `zola build` 通过：10 页面 + 2 section + atom.xml/sitemap/搜索索引/giallo 双主题 CSS。
 - 浏览器实测（Chrome，1440px 桌面 + 390px 移动）：
   - 首页 Banner、打字机副标题、社交链接、文章卡片、分页、侧栏（公告/头像/等级/统计）✓
   - 文章页：元信息、字数/阅读时长、TOC 滚动高亮、Mac 代码块（复制/折叠按钮）、
@@ -58,8 +61,11 @@ zola-theme-redefine/
   - 归档时间线、标签 blur 云、分类卡片、友链、书签、说说、相册、404 ✓
   - 移动端抽屉菜单（导航 + 侧栏链接去重）✓
   - 控制台无错误（仅搜索输入框缺少 id/name 的 a11y 提示，与原版一致）✓
-- 与官方演示站 redefine.ohevan.com 逐屏对比，视觉与交互一致；
-  已知差异（分类层级、推荐算法、字数统计口径）记录于 themes/redefine/README.md。
+- 与官方演示站 redefine.ohevan.com 逐屏对比，视觉与交互一致。
+- 对照 redefine-docs 逐章核对：写作模块（callout/button/folding/grid/tabs/mermaid）
+  以 Tera 组件补齐并实测（选项卡切换、mermaid SVG、网格布局）；aplayer 资产接线；
+  配置驱动的标题间距/导航宽度/横幅文字样式/字体/图片圆角/黑幕遮罩/TOC 展开等
+  内联 CSS 覆盖补齐。核对清单见 themes/redefine/README.md。
 
 ## 后续可选项
 

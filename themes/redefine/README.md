@@ -101,6 +101,57 @@ articles / comment / footer / inject / plugins / page_templates / cdn ...），
   仅 `tools/codeBlock.js`（适配 Zola 的 `<pre class="giallo">` DOM）
   与 `tools/localSearch.js`（适配 Zola 搜索索引格式）做了改写，源码与产物保持同步。
 
+## 写作模块（原 Hexo 标签插件 → Tera 组件）
+
+Zola 0.23 移除了 shortcodes，改用 **Tera 组件**。主题在 `templates/components/`
+提供与原版标签插件 DOM 一致的组件，可直接写在 Markdown 正文中：
+
+| 原语法 | Zola 组件用法 |
+| --- | --- |
+| `{% callout warning fa-x::标题 %}…{% endcallout %}` | `{% <callout type="warning" icon="fa-solid fa-x" title="标题"> %}…{% </callout> %}` |
+| `{% button 文本, 链接, 图标 %}` | `{{<button text="文本" url="…" icon="fa-solid fa-x" />}}` |
+| `{% folding 标题 %}…{% endfolding %}` | `{% <folding title="标题" open=true> %}…{% </folding> %}` |
+| `{% grid 3 %}…{% endgrid %}` | `{% <grid cols={3} gap="16px"> %}…{% </grid> %}` |
+| `{% tabs %}<!-- tab 名@<i …> -->…{% endtabs %}` | `{% <tabs name="x"> %}<!-- tab 名@<i class="fa-solid fa-star"></i> -->…{% </tabs> %}` |
+| `{% mermaid %}`（hexo-filter） | `{% <mermaid> %}graph LR; A-->B;{% </mermaid> %}` |
+
+注意：
+
+- 组件非字符串参数需用 `{2}` 形式传入（如 `cols={3}`）。
+- 组件输出会再经过一次 Markdown 渲染，因此组件模板输出必须是不含空行的连续
+  HTML 块，否则缩进行会被解析为代码块（tabs 组件已按此约定实现）。
+- 旧 note 系列标签已废弃，请统一使用 `callout` 组件。
+
+## 官方文档功能核对清单
+
+对照 redefine-docs（zh/docs）逐项核对的结果：
+
+| 文档章节 | 功能 | 状态 |
+| --- | --- | --- |
+| basic/info · defaults · colors | 标题/作者/favicon/头像/logo/主色/默认暗色 | ✅ 键名一致，CSS 变量运行时覆盖 |
+| basic/global | 自定义字体、内容宽度、侧栏(TOC)宽度、悬停效果、阅读进度、网站统计、单页应用、Open Graph、预加载动画、侧边工具栏、Google Analytics | ✅（字体/宽度等由模板内联 CSS 覆盖；hover.scale 需重编 CSS） |
+| basic/fontawesome | thin/light/duotone/sharp_solid | ✅ 条件加载 |
+| home/home_banner | 样式 static/fixed、明暗图、标题、打字机副标题、hitokoto、文字颜色/样式、自定义字体、社交链接+二维码 | ✅ |
+| home/navbar | auto_hide、渐变背景、宽度、链接+子菜单、本地搜索 | ✅（宽度的区分首页/内页用 CSS `:has` 实现） |
+| home/home | 侧栏、日期格式、摘要长度、分类/标签显示 | ✅ |
+| posts/articles | 字号/行高/图片圆角/对齐/链接图标/黑幕遮罩/标题间距、字数统计、作者标签、代码块（复制/样式/明暗主题/字体）、目录、版权、懒加载、文章推荐 | ✅（推荐算法以同分类聚合近似；`link_icon` 需站点开启 `markdown.external_links_class = "external-link"`） |
+| article_customize | cover/banner、thumbnail、excerpt（自定义/关闭）、sticky、expires | ✅（sticky 显示置顶徽标；Zola 无法按 sticky 值重排序） |
+| posts/comment | waline/gitalk/twikoo/giscus/utterances/artalk | ✅ 六套全部移植，`page.extra.comment = false` 可单篇关闭 |
+| footer | 运行时间、图标、起始年份、统计、自定义、ICP | ✅ |
+| inject | head/footer 注入 | ✅ |
+| page_templates | friends、tags（blur/cloud）、categories、masonry、bookmarks | ✅ |
+| modules | callout、button、folding、grid、tabs | ✅ 以 Tera 组件实现（见上表） |
+| plugins/mermaid | mermaid 图表 + 明暗主题 | ✅ `{% <mermaid> %}` 组件 |
+| plugins/aplayer | 固定播放器 | ✅ 配置 `plugins.aplayer.audios` 数组后自动加载 |
+| shuoshuo/essays | 本地说说 | ✅ `[[extra.redefine.essays]]` |
+| shuoshuo/artitalk | Artitalk 远程说说 | ➖ 与主题无关，用 `inject` 注入 Artitalk JS 即可 |
+| plugins/encrypt | 文章加密 | ➖ Hexo 构建期插件无 Zola 等价物；可改用静态站通用的客户端加密方案 |
+| plugins/mathjax | LaTeX 公式 | ➖ 通过 `inject` 引入 MathJax/KaTeX（Zola 无内置渲染） |
+| plugins/all_minifier | 全站压缩 | ➖ Zola 用 `minify_html = true`；CSS/JS 主题侧已压缩 |
+| cdn | 主题资产 CDN | ➖ Zola 主题本地分发，无 npm CDN 概念；可用对象存储镜像 static/ |
+| language | en/zh-CN/zh-TW/ja | ✅ `default_language` + `[translations]` + i18n JS（附赠 es/fr） |
+| developer | 二次开发 | ✅ 模板/组件均为可读源码，样式构建脚本在 tools/ |
+
 ## 与原主题的功能差异
 
 - **分类无层级**：Zola taxonomies 是扁平的，原版的父子分类（A > B）显示为平级。
@@ -111,7 +162,9 @@ articles / comment / footer / inject / plugins / page_templates / cdn ...），
   不支持中文站点用 elasticlunr 语言管道，因此固定使用 fuse 格式。
 - **字数统计**：Zola 的 `word_count` 按空白分词（中文按字符计），与 hexo-wordcount
   数值略有差异；阅读时间取 `reading_time`。
-- **文章加密（hbe）**、APlayer 播放器 UI 已随资产带入但未接入（原版也需额外插件）。
+- **写作模块**：以 Tera 组件替代 Hexo 标签插件（tabs 为单层实现，不支持 hexo 的
+  subtabs/subsubtabs 多层嵌套）。
+- **文章加密（hbe）**：JS 资产随主题带入但无构建期加密，等价方案见上表。
 - masonry 相册数据从 `theme.masonry` 改为 `static/masonry/data.json`
   （字段：`image / title / description / width / height`）。
 
